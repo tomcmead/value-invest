@@ -18,6 +18,10 @@ set(SRC
     ${SRC_DIR}/value_invest.cpp
 )
 
+set(TEST_NAME
+    TestValueInvest
+)
+
 ################################
 # Project
 ################################
@@ -33,3 +37,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE libcurl spdlog SQLite::SQLite3)
+
+################################
+# Tests
+################################
+project(${TEST_NAME})
+
+add_subdirectory(tests)
+enable_testing()
+add_test(${TEST_NAME} ${TEST_NAME})
