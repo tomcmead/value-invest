@@ -8,6 +8,9 @@ set(PROJECT_NAME
 set(SRC_DIR
     src
 )
+set(LIB_DIR
+    lib
+)
 set(DOC_DIR
     docs
 )
@@ -21,4 +24,7 @@ set(SRC
 project(${PROJECT_NAME})
 
 add_subdirectory(${DOC_DIR})
+add_subdirectory(${LIB_DIR})
 add_executable(${PROJECT_NAME} ${SRC})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libcurl)
