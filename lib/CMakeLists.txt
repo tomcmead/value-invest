@@ -25,3 +25,14 @@ set(RAPIDJSON_BUILD_DOC OFF CACHE INTERNAL "")
 set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 set(RAPIDJSON_BUILD_TESTS OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(rapidjson)
+
+################################
+# spdlog
+################################
+include(FetchContent)
+FetchContent_Declare(
+    spdlog
+    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.13.0.tar.gz
+    FIND_PACKAGE_ARGS 1.13.0
+)
+FetchContent_MakeAvailable(spdlog)
