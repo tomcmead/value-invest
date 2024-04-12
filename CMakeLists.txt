@@ -27,8 +27,9 @@ add_subdirectory(${DOC_DIR})
 add_subdirectory(${LIB_DIR})
 add_executable(${PROJECT_NAME} ${SRC})
 
+find_package(SQLite3 REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libcurl spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE libcurl spdlog SQLite::SQLite3)
