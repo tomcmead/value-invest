@@ -36,3 +36,5 @@ FetchContent_Declare(
     FIND_PACKAGE_ARGS 1.13.0
 )
 FetchContent_MakeAvailable(spdlog)
+
+add_subdirectory(curl_handler)
