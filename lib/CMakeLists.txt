@@ -38,3 +38,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(spdlog)
 
 add_subdirectory(curl_handler)
+add_subdirectory(stock_data)
