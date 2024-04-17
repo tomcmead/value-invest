@@ -17,7 +17,7 @@ CurlHandler::CurlHandler()
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl_handle = curl_easy_init();
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, CurlWriteCallback);
-    spdlog::info("CurlHandler Configured");
+    spdlog::info("CurlHandler::CurlHandler Configured");
 }
 
 /// @brief Cleanup cURL library data
@@ -28,7 +28,7 @@ CurlHandler::~CurlHandler()
         curl_easy_cleanup(curl_handle);
     }
     curl_global_cleanup();
-    spdlog::info("CurlHandler Destroyed");
+    spdlog::info("CurlHandler::~CurlHandler Destroyed");
 }
 
 /// @brief Create singleton CurlHandler instance
@@ -74,7 +74,7 @@ long CurlHandler::PerformHttpGet(std::string url) const
     }
 
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
-    spdlog::info("CurlHandler::PerformHttpGet HTTP GET request successful");
+    spdlog::info("CurlHandler::PerformHttpGet CURL request successful");
     return http_code;
 }
 
