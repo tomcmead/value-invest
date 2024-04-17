@@ -1,6 +1,7 @@
 #pragma once
 
 #include <curl/curl.h>
+#include <string>
 
 /// @brief cURL library API handler.
 /// 'Singleton' and 'Facade' design patterns
@@ -13,7 +14,7 @@ public:
     static CurlHandler* GetInstance();
     static void DeleteInstance();
 
-    CURLcode PerformHttpGet();
+    long PerformHttpGet(std::string url) const;
 private:
     CurlHandler();
     static size_t CurlWriteCallback(void *buffer, size_t size, size_t nmemb, void *userp);

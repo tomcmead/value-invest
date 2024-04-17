@@ -3,12 +3,13 @@
 #include <string>
 #include "curl_handler.h"
 
-CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
-
 namespace
 {
-    const std::string kRemote_endpoint_url = "www.google.com";
+    const int kHttp_ok = 200;
+    const int kHttp_bad_request = 300;
 }
+
+CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
 
 /// @brief Initialise cURL library
 CurlHandler::CurlHandler()
@@ -50,14 +51,34 @@ void CurlHandler::DeleteInstance()
     }
 }
 
-CURLcode CurlHandler::PerformHttpGet()
+/// @brief Execute HTTP GET request for target URL
+/// @param url target URL address
+/// @return HTTP status code
+long CurlHandler::PerformHttpGet(std::string url) const
 {
-    curl_easy_setopt(curl_handle, CURLOPT_URL, kRemote_endpoint_url.c_str());
-    CURLcode res = curl_easy_perform(curl_handle);
-    spdlog::info("HTTP Status code: {0:d}", static_cast<int>(res));
-    return res;
+    long http_code = 0;
+    curl_easy_setopt(curl_handle, CURLOPT_URL, url.c_str());
+
+    try
+    {
+        CURLcode curl_code = curl_easy_perform(curl_handle);
+        if(curl_code != CURLE_OK)
+        {
+            throw std::runtime_error("CurlHandler::PerformHttpGet CURL request failed with CURL Code: " + std::to_string(curl_code));
+        }
+    }
+    catch(const std::exception &ex)
+    {
+        spdlog::critical(ex.what());
+        return kHttp_bad_request;
+    }
+
+    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
+    spdlog::info("CurlHandler::PerformHttpGet HTTP GET request successful");
+    return http_code;
 }
 
+/// @brief Empty libcurl callback for HTTP GET request
 size_t CurlHandler::CurlWriteCallback(void *buffer, size_t size, size_t nmemb, void *userp)
 {
    return size * nmemb;
