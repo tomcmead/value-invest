@@ -17,6 +17,12 @@ set(DOC_DIR
 set(SRC
     ${SRC_DIR}/value_invest.cpp
 )
+set(LIBS
+    libcurl
+    spdlog
+    SQLite::SQLite3
+    CurlHandler
+)
 
 set(TEST_NAME
     TestValueInvest
@@ -37,7 +43,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl_handler/include
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libcurl spdlog SQLite::SQLite3 CurlHandler)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
 
 ################################
 # Tests
