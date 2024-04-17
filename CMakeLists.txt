@@ -22,6 +22,7 @@ set(LIBS
     spdlog
     SQLite::SQLite3
     CurlHandler
+    StockData
 )
 
 set(TEST_NAME
@@ -41,6 +42,7 @@ find_package(SQLite3 REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl_handler/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_data/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
