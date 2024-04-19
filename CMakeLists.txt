@@ -23,6 +23,7 @@ set(LIBS
     SQLite::SQLite3
     CurlHandler
     StockData
+    FinancialJson
 )
 
 set(TEST_NAME
@@ -43,6 +44,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl_handler/include
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_data/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/financial_json/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
