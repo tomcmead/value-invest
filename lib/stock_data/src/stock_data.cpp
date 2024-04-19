@@ -23,18 +23,27 @@ StockData::StockData()
         return;
     }
 
-    spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key.c_str());
+    spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
-void StockData::GetIncomeStatement(std::string symbol)
+void StockData::GetFundamentalFinancal(std::string symbol,
+    FundamentalFinancalType fundamental_type)
 {
+    std::string api_instruction = "";
+    switch(fundamental_type)
+    {
+        case kIncomeStatement: api_instruction.append(kIncome_statement_api);
+    }
+    api_instruction.append(symbol);
+
     try
     {
-        std::string api_instruction = kIncome_statement_api + symbol + "&apikey=" + alpha_vantage_api_key;
         long http_code = curl_handle->PerformHttpGet(api_instruction);
         if(http_code != kHttp_ok)
         {
-            std::runtime_error("StockData::GetIncomeStatement HTTP request failed with HTTP Code: " + std::to_string(http_code));
+            std::runtime_error("StockData::GetFundamentalFinancal " + symbol +
+                " " + std::to_string(fundamental_type) + " HTTP request failed with HTTP Code: "
+                + std::to_string(http_code));
         }
     }
     catch(const std::exception& e)
@@ -42,5 +51,5 @@ void StockData::GetIncomeStatement(std::string symbol)
         spdlog::critical(e.what());
         return;
     }
-    spdlog::info("StockData::GetIncomeStatement HTTP GET request successful");
+    spdlog::info("StockData::GetFundamentalFinancal {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
 }
