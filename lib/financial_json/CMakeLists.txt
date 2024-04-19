@@ -7,7 +7,8 @@ set(LIB_NAME
 project(${LIB_NAME})
 
 set(SRC_FILES
-    src/financial_json.cpp)
+    src/financial_json.cpp
+    src/income_statement.cpp)
 
 add_library(${LIB_NAME} STATIC
     ${SRC_FILES})
