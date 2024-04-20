@@ -30,15 +30,18 @@ void StockData::GetFundamentalFinancal(std::string symbol,
     FundamentalFinancalType fundamental_type)
 {
     std::string api_instruction = "";
+    std::string http_response = "";
+
     switch(fundamental_type)
     {
         case kIncomeStatement: api_instruction.append(kIncome_statement_api);
     }
     api_instruction.append(symbol);
+    api_instruction.append("&apikey=" + alpha_vantage_api_key);
 
     try
     {
-        long http_code = curl_handle->PerformHttpGet(api_instruction);
+        long http_code = curl_handle->PerformHttpGet(api_instruction, http_response);
         if(http_code != kHttp_ok)
         {
             std::runtime_error("StockData::GetFundamentalFinancal " + symbol +
@@ -51,5 +54,5 @@ void StockData::GetFundamentalFinancal(std::string symbol,
         spdlog::critical(e.what());
         return;
     }
-    spdlog::info("StockData::GetFundamentalFinancal {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
+    spdlog::info("StockData::GetFundamentalFinancal {} {} HTTP GET request successful: {}", symbol, std::to_string(fundamental_type), http_response);
 }

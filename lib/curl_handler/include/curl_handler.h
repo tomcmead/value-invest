@@ -14,10 +14,10 @@ public:
     static CurlHandler* GetInstance();
     static void DeleteInstance();
 
-    long PerformHttpGet(std::string url) const;
+    long PerformHttpGet(std::string url, std::string& response) const;
 private:
     CurlHandler();
-    static size_t CurlWriteCallback(void *buffer, size_t size, size_t nmemb, void *userp);
+    static size_t CurlWriteCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
     static CurlHandler* curl_handler_instance;
     CURL* curl_handle;
