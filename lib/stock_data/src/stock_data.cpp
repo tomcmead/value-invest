@@ -17,15 +17,14 @@ namespace
 StockData::StockData()
 {
     curl_handle = CurlHandler::GetInstance();
+    alpha_vantage_api_key = "";
 
-    alpha_vantage_api_key = std::getenv(kAlpha_vantage_api_key_env_var.c_str());
-
-    if(alpha_vantage_api_key.empty() == true)
+    if(std::getenv(kAlpha_vantage_api_key_env_var.c_str()) == NULL)
     {
         spdlog::critical("StockData::StockData evironment variable '" + kAlpha_vantage_api_key_env_var + "' is not set");
         return;
     }
-
+    alpha_vantage_api_key = std::getenv(kAlpha_vantage_api_key_env_var.c_str());
     spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
@@ -66,6 +65,12 @@ std::string StockData::GetFundamentalFinancial(std::string symbol,
 void StockData::GetFinancial(std::string symbol,
     FinancialType financial_type)
 {
+    if(alpha_vantage_api_key.empty() == true)
+    {
+        spdlog::critical("StockData::GetFinancial evironment variable '" + kAlpha_vantage_api_key_env_var + "' is not set");
+        return;
+    }
+
     switch(financial_type)
     {
         case kGross_profit:
