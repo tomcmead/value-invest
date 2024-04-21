@@ -1,8 +1,10 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <cstdlib>
+#include <memory>
 #include "stock_data.h"
 #include "curl_handler.h"
+#include "income_statement_parser.h"
 
 namespace
 {
@@ -11,6 +13,7 @@ namespace
     const std::string kIncome_statement_api = "https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=";
 }
 
+/// @brief Configure CurlHandler, FinancialJson & API key
 StockData::StockData()
 {
     curl_handle = CurlHandler::GetInstance();
@@ -26,15 +29,17 @@ StockData::StockData()
     spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
-void StockData::GetFundamentalFinancal(std::string symbol,
-    FundamentalFinancalType fundamental_type)
+std::string StockData::GetFundamentalFinancial(std::string symbol,
+    FundamentalFinancialType fundamental_type)
 {
     std::string api_instruction = "";
     std::string http_response = "";
 
     switch(fundamental_type)
     {
-        case kIncomeStatement: api_instruction.append(kIncome_statement_api);
+        case kIncomeStatement:
+            api_instruction.append(kIncome_statement_api);
+            break;
     }
     api_instruction.append(symbol);
     api_instruction.append("&apikey=" + alpha_vantage_api_key);
@@ -44,7 +49,7 @@ void StockData::GetFundamentalFinancal(std::string symbol,
         long http_code = curl_handle->PerformHttpGet(api_instruction, http_response);
         if(http_code != kHttp_ok)
         {
-            std::runtime_error("StockData::GetFundamentalFinancal " + symbol +
+            std::runtime_error("StockData::GetFundamentalFinancial " + symbol +
                 " " + std::to_string(fundamental_type) + " HTTP request failed with HTTP Code: "
                 + std::to_string(http_code));
         }
@@ -52,7 +57,22 @@ void StockData::GetFundamentalFinancal(std::string symbol,
     catch(const std::exception& e)
     {
         spdlog::critical(e.what());
-        return;
+        return "";
     }
-    spdlog::info("StockData::GetFundamentalFinancal {} {} HTTP GET request successful: {}", symbol, std::to_string(fundamental_type), http_response);
+    spdlog::info("StockData::GetFundamentalFinancial {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
+    return http_response;
+}
+
+void StockData::GetFinancial(std::string symbol,
+    FinancialType financial_type)
+{
+    switch(financial_type)
+    {
+        case kGross_profit:
+        {
+            std::string income_statement_data = GetFundamentalFinancial(symbol, kIncomeStatement);
+            std::unique_ptr<IncomeStatementParser> income_statement(new IncomeStatementParser(income_statement_data));
+            break;
+        }
+    }
 }

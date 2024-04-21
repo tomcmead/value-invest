@@ -39,4 +39,4 @@ FetchContent_MakeAvailable(spdlog)
 
 add_subdirectory(curl_handler)
 add_subdirectory(stock_data)
-add_subdirectory(financial_json)
+add_subdirectory(financial_json_parser)
