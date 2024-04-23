@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-struct IncomeStatementData : private FinancialDataType
+struct IncomeStatementData : public FinancialData
 {
 public:
     std::map<int, int> gross_profit;
@@ -36,8 +36,7 @@ public:
 class IncomeStatementParser : public FinancialJsonParser
 {
 public:
-    std::vector<int> GetFinancial(FinancialDataType financial_data_type) override;
+    void GetFinancial(FinancialData& financial_data) override;
 private:
     using FinancialJsonParser::FinancialJsonParser; // inherit parent constructor
-    IncomeStatementData* income_statement_data;
 };

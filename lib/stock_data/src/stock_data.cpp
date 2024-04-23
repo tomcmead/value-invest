@@ -28,7 +28,20 @@ StockData::StockData()
     spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
-std::string StockData::GetFundamentalFinancial(std::string symbol,
+FinancialData StockData::GetFinancialData(std::string symbol,
+    FundamentalFinancialType fundamental_type)
+{
+    if(alpha_vantage_api_key.empty() == true)
+    {
+        spdlog::critical("StockData::GetFinancial evironment variable '" + kAlpha_vantage_api_key_env_var + "' is not set");
+    }
+
+    std::string fundamental_data = GetApiFundamentalData(symbol, fundamental_type);
+    FinancialData financial_data = ParseFundamentalData(fundamental_data, fundamental_type);
+    return financial_data;
+}
+
+std::string StockData::GetApiFundamentalData(std::string symbol,
     FundamentalFinancialType fundamental_type)
 {
     std::string api_instruction = "";
@@ -48,7 +61,7 @@ std::string StockData::GetFundamentalFinancial(std::string symbol,
         long http_code = curl_handle->PerformHttpGet(api_instruction, http_response);
         if(http_code != kHttp_ok)
         {
-            std::runtime_error("StockData::GetFundamentalFinancial " + symbol +
+            std::runtime_error("StockData::GetApiFinancialData " + symbol +
                 " " + std::to_string(fundamental_type) + " HTTP request failed with HTTP Code: "
                 + std::to_string(http_code));
         }
@@ -58,26 +71,23 @@ std::string StockData::GetFundamentalFinancial(std::string symbol,
         spdlog::critical(e.what());
         return "";
     }
-    spdlog::info("StockData::GetFundamentalFinancial {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
+    spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
     return http_response;
 }
 
-void StockData::GetFinancial(std::string symbol,
-    FinancialType financial_type)
+FinancialData StockData::ParseFundamentalData(std::string fundamental_data,
+    FundamentalFinancialType fundamental_type)
 {
-    if(alpha_vantage_api_key.empty() == true)
+    IncomeStatementData data;
+    switch(fundamental_type)
     {
-        spdlog::critical("StockData::GetFinancial evironment variable '" + kAlpha_vantage_api_key_env_var + "' is not set");
-        return;
-    }
-
-    switch(financial_type)
-    {
-        case kGross_profit:
+        case kIncomeStatement:
         {
-            std::string income_statement_data = GetFundamentalFinancial(symbol, kIncomeStatement);
-            std::unique_ptr<IncomeStatementParser> income_statement(new IncomeStatementParser(income_statement_data));
-            break;
+            std::unique_ptr<IncomeStatementParser> income_statement_parser(new IncomeStatementParser(fundamental_data));
+            IncomeStatementData income_statement_data;
+            income_statement_parser->GetFinancial(income_statement_data);
+            return income_statement_data;
         }
     }
+    return data;
 }

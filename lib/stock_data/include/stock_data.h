@@ -2,15 +2,11 @@
 
 #include <string>
 #include "curl_handler.h"
+#include "income_statement_parser.h"
 
 enum FundamentalFinancialType
 {
     kIncomeStatement
-};
-
-enum FinancialType
-{
-    kGross_profit = 0
 };
 
 /// @brief Get historical stock data
@@ -19,13 +15,15 @@ class StockData
 {
 public:
     StockData();
-    void GetFinancial(std::string symbol,
-        FinancialType financial_type);
+    FinancialData GetFinancialData(std::string symbol,
+        FundamentalFinancialType fundamental_type);
 
 private:
     CurlHandler* curl_handle;
     std::string alpha_vantage_api_key;
 
-    std::string GetFundamentalFinancial(std::string symbol,
+    std::string GetApiFundamentalData(std::string symbol,
+        FundamentalFinancialType fundamental_type);
+    FinancialData ParseFundamentalData(std::string fundamental_data,
         FundamentalFinancialType fundamental_type);
 };

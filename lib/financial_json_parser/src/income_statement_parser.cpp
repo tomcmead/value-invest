@@ -3,8 +3,7 @@
 #include <vector>
 #include <spdlog/spdlog.h>
 
-std::vector<int> IncomeStatementParser::GetFinancial(FinancialDataType financial_data_type)
+void IncomeStatementParser::GetFinancial(FinancialData& financial_data)
 {
     spdlog::info("IncomeStatement::GetFinancial");
-    return {};
 }

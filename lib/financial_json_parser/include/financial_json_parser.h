@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-struct FinancialDataType{};
+struct FinancialData{};
 
 /// @brief Fundamental finacial abstract class
 /// converts json string into FinanicalType struct
@@ -13,7 +13,7 @@ class FinancialJsonParser
 public:
     FinancialJsonParser(std::string fundamental_json);
     ~FinancialJsonParser();
-    virtual std::vector<int> GetFinancial(FinancialDataType financial_data_type) = 0;
+    virtual void GetFinancial(FinancialData& financial_data) = 0;
 protected:
     rapidjson::Document* json_document;
 };
