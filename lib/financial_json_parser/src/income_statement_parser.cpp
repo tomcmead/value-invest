@@ -16,8 +16,11 @@ void IncomeStatementParser::GetFinancial(FinancialData& financial_data)
         std::string date_str = annual_report["fiscalDateEnding"].GetString();
         int year = std::stoi(date_str.substr(0,4));
 
-        int gross_profit = std::stoi(annual_report["grossProfit"].GetString());
-        income_statement.gross_profit.insert(std::pair<int,int>(year, gross_profit));
+        for(int i=0; i<income_statement.financials.size(); i++)
+        {
+            long data = std::stol(annual_report[income_statement.financial_names[i].c_str()].GetString());
+            income_statement.financials[i]->insert(std::pair<int, long>(year, data));
+        }
     }
 
     financial_data = income_statement;
