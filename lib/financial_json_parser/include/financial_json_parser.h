@@ -15,5 +15,5 @@ public:
     ~FinancialJsonParser();
     virtual void GetFinancial(FinancialData& financial_data) = 0;
 protected:
-    rapidjson::Document* json_document;
+    rapidjson::Document json_document;
 };
