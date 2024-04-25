@@ -1,5 +1,5 @@
 #include "income_statement_parser.h"
-#include "financial_json_parser.h"
+#include "json_parser.h"
 #include <spdlog/spdlog.h>
 #include <rapidjson/document.h>
 #include <vector>

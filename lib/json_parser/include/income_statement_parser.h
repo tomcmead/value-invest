@@ -1,6 +1,6 @@
 #pragma once
 
-#include "financial_json_parser.h"
+#include "json_parser.h"
 #include <map>
 #include <vector>
 
@@ -56,10 +56,10 @@ public:
 
 /// @brief Parse string json financial data to IncomeStatementData
 /// 'adapter' design pattern for Alpha Vantage API and StockData lib income statement
-class IncomeStatementParser : public FinancialJsonParser
+class IncomeStatementParser : public JsonParser
 {
 public:
     void GetFinancial(FinancialData& financial_data) override;
 private:
-    using FinancialJsonParser::FinancialJsonParser; // inherit parent constructor
+    using JsonParser::JsonParser; // inherit parent constructor
 };

@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.28.3)
 
 set(LIB_NAME
-    FinancialJsonParser
+    JsonParser
 )
 
 project(${LIB_NAME})
 
 set(SRC_FILES
-    src/financial_json_parser.cpp
+    src/json_parser.cpp
     src/income_statement_parser.cpp)
 
 add_library(${LIB_NAME} STATIC

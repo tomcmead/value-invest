@@ -2,7 +2,7 @@
 
 #include <string>
 #include "curl_handler.h"
-#include "income_statement_parser.h"
+#include "json_parser.h"
 
 /// @brief Enumerate list of fundamental financial data types
 enum FundamentalFinancialType
