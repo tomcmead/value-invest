@@ -4,10 +4,11 @@
 #include <string>
 #include <vector>
 
+/// @brief Financial data base structure
 struct FinancialData{};
 
-/// @brief Fundamental finacial abstract class
-/// converts json string into FinanicalType struct
+/// @brief Fundamental finacial base class
+/// 'adapter' design pattern converts json string into FinanicalData struct
 class FinancialJsonParser
 {
 public:

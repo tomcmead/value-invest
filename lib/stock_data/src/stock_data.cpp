@@ -13,9 +13,11 @@ namespace
     const std::string kIncome_statement_api = "https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=";
 }
 
-/// @brief Configure CurlHandler, FinancialJson & API key
+/// @brief Configure CurlHandler and Alpha Vantage API key
 StockData::StockData()
 {
+    spdlog::info("StockData::StockData");
+
     curl_handle = CurlHandler::GetInstance();
     alpha_vantage_api_key = "";
 
@@ -28,9 +30,15 @@ StockData::StockData()
     spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
+/// @brief Generate FinancialData struct of requested symbol and financial type
+/// @param symbol stock ticker
+/// @param fundamental_type enum of finanical data type
+/// @return financial data struct
 FinancialData StockData::GetFinancialData(std::string symbol,
     FundamentalFinancialType fundamental_type)
 {
+    spdlog::info("StockData::GetFinancialData");
+
     if(alpha_vantage_api_key.empty() == true)
     {
         spdlog::critical("StockData::GetFinancial evironment variable '" + kAlpha_vantage_api_key_env_var + "' is not set");
@@ -41,9 +49,15 @@ FinancialData StockData::GetFinancialData(std::string symbol,
     return financial_data;
 }
 
+/// @brief Gets raw API JSON data response as string
+/// @param symbol stock ticker
+/// @param fundamental_type enum of finanical data type
+/// @return API JSON string response
 std::string StockData::GetApiFundamentalData(std::string symbol,
     FundamentalFinancialType fundamental_type)
 {
+    spdlog::info("StockData::GetApiFinancialData");
+
     std::string api_instruction = "";
     std::string http_response = "";
 
@@ -75,9 +89,15 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
     return http_response;
 }
 
+/// @brief Convert raw JSON API string data to FinancialData struct
+/// @param fundamental_data JSON string
+/// @param fundamental_type enum of finanical data type
+/// @return FinancialData struct
 FinancialData StockData::ParseFundamentalData(std::string fundamental_data,
     FundamentalFinancialType fundamental_type)
 {
+    spdlog::info("StockData::ParseFundamentalData");
+
     IncomeStatementData data;
     switch(fundamental_type)
     {

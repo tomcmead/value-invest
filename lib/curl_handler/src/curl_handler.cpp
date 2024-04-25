@@ -14,6 +14,8 @@ CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
 /// @brief Initialise cURL library
 CurlHandler::CurlHandler()
 {
+    spdlog::info("CurlHandler::CurlHandler");
+
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl_handle = curl_easy_init();
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, CurlWriteCallback);
@@ -24,6 +26,8 @@ CurlHandler::CurlHandler()
 /// @brief Cleanup cURL library data
 CurlHandler::~CurlHandler()
 {
+    spdlog::info("CurlHandler::~CurlHandler");
+
     if(curl_handle != nullptr)
     {
         curl_easy_cleanup(curl_handle);
@@ -36,6 +40,8 @@ CurlHandler::~CurlHandler()
 /// @return Pointer to CurlHandler singleton instance
 CurlHandler* CurlHandler::GetInstance()
 {
+    spdlog::info("CurlHandler::GetInstance");
+
     if(curl_handler_instance == nullptr)
     {
         curl_handler_instance = new CurlHandler();
@@ -46,6 +52,8 @@ CurlHandler* CurlHandler::GetInstance()
 /// @brief Delete CurlHandler singleton instance
 void CurlHandler::DeleteInstance()
 {
+    spdlog::info("CurlHandler::DeleteInstance");
+
     if(curl_handler_instance != nullptr)
     {
         delete curl_handler_instance;
@@ -57,6 +65,8 @@ void CurlHandler::DeleteInstance()
 /// @return HTTP status code
 long CurlHandler::PerformHttpGet(std::string url, std::string &response) const
 {
+    spdlog::info("CurlHandler::PerformHttpGet");
+
     long http_code = 0;
     curl_easy_setopt(curl_handle, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &response);

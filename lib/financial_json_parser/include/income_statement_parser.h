@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+/// @brief Income statement data structure
 struct IncomeStatementData : public FinancialData
 {
 public:
@@ -53,6 +54,8 @@ public:
         "ebit", "ebitda", "netIncome"};
 };
 
+/// @brief Parse string json financial data to IncomeStatementData
+/// 'adapter' design pattern for Alpha Vantage API and StockData lib income statement
 class IncomeStatementParser : public FinancialJsonParser
 {
 public:

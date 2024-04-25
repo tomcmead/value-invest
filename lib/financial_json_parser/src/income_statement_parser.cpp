@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 
+/// @brief Parse JSON income statement object to FinancialData type
+/// @param financial_data 
 void IncomeStatementParser::GetFinancial(FinancialData& financial_data)
 {
     spdlog::info("IncomeStatementParser::GetFinancial");
