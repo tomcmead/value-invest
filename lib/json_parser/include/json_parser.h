@@ -5,8 +5,9 @@
 #include <vector>
 
 /// @brief Financial data base structure
-struct FinancialData{
-    ~FinancialData() = default;
+struct FinancialData
+{
+    virtual ~FinancialData() = default;
 };
 
 /// @brief Fundamental finacial base class
