@@ -1,10 +1,10 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <cstdlib>
-#include <memory>
 #include "stock_data.h"
 #include "curl_handler.h"
 #include "income_statement.h"
+#include "financial_report.h"
 #include "json_parser.h"
 
 /// @brief Configure CurlHandler and Alpha Vantage API key
@@ -26,17 +26,17 @@ StockData::StockData()
 
 /// @brief Gets raw API JSON data response as string
 /// @param symbol stock ticker
-/// @param fundamental_type enum of finanical data type
+/// @param report_type enum of finanical data type
 /// @return API JSON string response
 std::string StockData::GetApiFundamentalData(std::string symbol,
-    FundamentalFinancialType fundamental_type)
+    FinancialReportType report_type)
 {
     spdlog::info("StockData::GetApiFinancialData");
 
     std::string api_instruction = "";
     std::string http_response = "";
 
-    switch(fundamental_type)
+    switch(report_type)
     {
         case kIncomeStatement:
             api_instruction.append(stock_data_api::kIncome_statement_api);
@@ -51,7 +51,7 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
         if(http_code != stock_data_api::kHttp_ok)
         {
             std::runtime_error("StockData::GetApiFinancialData " + symbol +
-                " " + std::to_string(fundamental_type) + " HTTP request failed with HTTP Code: "
+                " " + std::to_string(report_type) + " HTTP request failed with HTTP Code: "
                 + std::to_string(http_code));
         }
     }
@@ -60,6 +60,6 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
         spdlog::critical(e.what());
         return "";
     }
-    spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(fundamental_type));
+    spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(report_type));
     return http_response;
 }

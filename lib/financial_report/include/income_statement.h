@@ -1,11 +1,11 @@
 #pragma once
 
-#include "financial_data.h"
+#include "financial_report.h"
 #include <map>
 #include <vector>
 
 /// @brief Income statement data structure
-struct IncomeStatement : public FinancialData
+struct IncomeStatement : public FinancialReport
 {
 public:
     std::map<int, long> gross_profit;

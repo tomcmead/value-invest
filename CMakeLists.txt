@@ -25,6 +25,7 @@ set(LIBS
     StockData
     JsonParser
     StockValuation
+    FinancialReport
 )
 
 set(TEST_NAME
@@ -47,6 +48,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_data/include
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/json_parser/include
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_valuation/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/financial_report/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})

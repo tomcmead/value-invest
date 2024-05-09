@@ -20,4 +20,5 @@ target_link_libraries(${LIB_NAME} PRIVATE
     spdlog
     libcurl
     CurlHandler
-    JsonParser)
+    JsonParser
+    FinancialReport)

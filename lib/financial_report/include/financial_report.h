@@ -1,15 +1,15 @@
 #pragma once
 
 /// @brief Enumerate list of fundamental financial data types
-enum FundamentalFinancialType
+enum FinancialReportType
 {
     kIncomeStatement
 };
 
 /// @brief Financial data base structure
-struct FinancialData
+struct FinancialReport
 {
 public:
-    virtual ~FinancialData() = default;
+    virtual ~FinancialReport() = default;
     bool valid;
 };

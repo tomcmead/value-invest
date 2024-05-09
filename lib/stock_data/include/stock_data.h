@@ -2,8 +2,8 @@
 
 #include <string>
 #include "curl_handler.h"
+#include "financial_report.h"
 #include "json_parser.h"
-#include "income_statement.h"
 
 namespace stock_data_api
 {
@@ -19,8 +19,8 @@ class StockData
 public:
     StockData();
     template<typename TFinancialType>
-    void GetFinancialData(std::string symbol,
-        FundamentalFinancialType fundamental_type,
+    bool GetFinancialData(std::string symbol,
+        FinancialReportType report_type,
         TFinancialType& financial_data);
 
 private:
@@ -28,21 +28,21 @@ private:
     std::string alpha_vantage_api_key;
 
     std::string GetApiFundamentalData(std::string symbol,
-        FundamentalFinancialType fundamental_type);
+        FinancialReportType report_type);
     template<typename TFinancialType>
     bool ParseFundamentalData(std::string fundamental_data,
-        FundamentalFinancialType fundamental_type,
+        FinancialReportType report_type,
         TFinancialType& financial_data);
 };
 
 /// @brief Generate FinancialData struct of requested symbol and financial type
 /// @param symbol stock ticker
-/// @param fundamental_type enum of finanical data type
+/// @param report_type enum of finanical data type
 /// @param financial_data reference to FinancialData
 /// @return bool 0=success, 1=fail
 template<typename TFinancialType>
-void StockData::GetFinancialData(std::string symbol,
-    FundamentalFinancialType fundamental_type,
+bool StockData::GetFinancialData(std::string symbol,
+    FinancialReportType report_type,
     TFinancialType& financial_data)
 {
     spdlog::info("StockData::GetFinancialData");
@@ -50,28 +50,33 @@ void StockData::GetFinancialData(std::string symbol,
     if(alpha_vantage_api_key.empty() == true)
     {
         spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
+        return 0;
     }
 
-    std::string fundamental_data = GetApiFundamentalData(symbol, fundamental_type);
-    ParseFundamentalData<TFinancialType>(fundamental_data, fundamental_type, financial_data);
+    std::string fundamental_data = GetApiFundamentalData(symbol, report_type);
+    return ParseFundamentalData<TFinancialType>(fundamental_data, report_type, financial_data);
 }
 
 /// @brief Convert raw JSON API string data to FinancialData struct
 /// @param fundamental_data JSON string
-/// @param fundamental_type enum of finanical data type
+/// @param report_type enum of finanical data type
 /// @param financial_data& reference to completed FinancialData struct
 /// @return bool 0=success, 1=fail
 template<typename TFinancialType>
 bool StockData::ParseFundamentalData(std::string fundamental_data,
-    FundamentalFinancialType fundamental_type,
+    FinancialReportType report_type,
     TFinancialType& financial_data)
 {
     spdlog::info("StockData::ParseFundamentalData");
 
-    // std::unique_ptr<JsonParser> json_parser(new JsonParser);
-    // bool parse_fail = json_parser->GetFinancial(fundamental_data, fundamental_type, financial_data);
+    if(fundamental_data.empty() == true)
+    {
+        spdlog::critical("StockData::ParseFundamentalData fundamental data empty");
+        return 1;
+    }
+
     JsonParser json_parser;
-    bool parse_fail = json_parser.GetFinancial<TFinancialType>(fundamental_data, fundamental_type, financial_data);
+    bool parse_fail = json_parser.GetFinancial<TFinancialType>(fundamental_data, financial_data);
     if(parse_fail == true)
     {
         spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
