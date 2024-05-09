@@ -4,7 +4,8 @@
 #include <memory>
 #include "stock_data.h"
 #include "curl_handler.h"
-#include "income_statement_parser.h"
+#include "income_statement.h"
+#include "json_parser.h"
 
 namespace
 {
@@ -33,9 +34,11 @@ StockData::StockData()
 /// @brief Generate FinancialData struct of requested symbol and financial type
 /// @param symbol stock ticker
 /// @param fundamental_type enum of finanical data type
-/// @return financial data struct
-FinancialData StockData::GetFinancialData(std::string symbol,
-    FundamentalFinancialType fundamental_type)
+/// @param financial_data reference to FinancialData
+/// @return bool 0=success, 1=fail
+void StockData::GetFinancialData(std::string symbol,
+    FundamentalFinancialType fundamental_type,
+    IncomeStatement& financial_data)
 {
     spdlog::info("StockData::GetFinancialData");
 
@@ -45,8 +48,7 @@ FinancialData StockData::GetFinancialData(std::string symbol,
     }
 
     std::string fundamental_data = GetApiFundamentalData(symbol, fundamental_type);
-    FinancialData financial_data = ParseFundamentalData(fundamental_data, fundamental_type);
-    return financial_data;
+    ParseFundamentalData(fundamental_data, fundamental_type, financial_data);
 }
 
 /// @brief Gets raw API JSON data response as string
@@ -92,22 +94,21 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
 /// @brief Convert raw JSON API string data to FinancialData struct
 /// @param fundamental_data JSON string
 /// @param fundamental_type enum of finanical data type
-/// @return FinancialData struct
-FinancialData StockData::ParseFundamentalData(std::string fundamental_data,
-    FundamentalFinancialType fundamental_type)
+/// @param financial_data& reference to completed FinancialData struct
+/// @return bool 0=success, 1=fail
+bool StockData::ParseFundamentalData(std::string fundamental_data,
+    FundamentalFinancialType fundamental_type,
+    IncomeStatement& financial_data)
 {
     spdlog::info("StockData::ParseFundamentalData");
 
-    IncomeStatementData data;
-    switch(fundamental_type)
+    // std::unique_ptr<JsonParser> json_parser(new JsonParser);
+    // bool parse_fail = json_parser->GetFinancial(fundamental_data, fundamental_type, financial_data);
+    JsonParser json_parser;
+    bool parse_fail = json_parser.GetFinancial<IncomeStatement>(fundamental_data, fundamental_type, financial_data);
+    if(parse_fail == true)
     {
-        case kIncomeStatement:
-        {
-            std::unique_ptr<IncomeStatementParser> income_statement_parser(new IncomeStatementParser(fundamental_data));
-            IncomeStatementData income_statement_data;
-            income_statement_parser->GetFinancial(income_statement_data);
-            return income_statement_data;
-        }
+        spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
     }
-    return data;
+    return parse_fail;
 }

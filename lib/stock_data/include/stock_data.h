@@ -3,12 +3,7 @@
 #include <string>
 #include "curl_handler.h"
 #include "json_parser.h"
-
-/// @brief Enumerate list of fundamental financial data types
-enum FundamentalFinancialType
-{
-    kIncomeStatement
-};
+#include "income_statement.h"
 
 /// @brief Get historical stock data
 /// 'facade' for 'Alpha Vantage API' financial data
@@ -16,8 +11,9 @@ class StockData
 {
 public:
     StockData();
-    FinancialData GetFinancialData(std::string symbol,
-        FundamentalFinancialType fundamental_type);
+    void GetFinancialData(std::string symbol,
+        FundamentalFinancialType fundamental_type,
+        IncomeStatement& financial_data);
 
 private:
     CurlHandler* curl_handle;
@@ -25,6 +21,7 @@ private:
 
     std::string GetApiFundamentalData(std::string symbol,
         FundamentalFinancialType fundamental_type);
-    FinancialData ParseFundamentalData(std::string fundamental_data,
-        FundamentalFinancialType fundamental_type);
+    bool ParseFundamentalData(std::string fundamental_data,
+        FundamentalFinancialType fundamental_type,
+        IncomeStatement& financial_data);
 };
