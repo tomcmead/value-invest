@@ -6,9 +6,9 @@ QUIET                  = NO
 # Basic settings:
 PROJECT_NAME           = "@CMAKE_PROJECT_NAME@"
 PROJECT_NUMBER         = @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@
-STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR_LINUX@ \ 
-                         @PROJECT_SOURCE_DIR_LINUX@
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR_LINUX@
+STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR@ \ 
+                         @PROJECT_SOURCE_DIR@
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/../lib @CMAKE_CURRENT_SOURCE_DIR@/../src
 FILE_PATTERNS          = *.h \
                          *.hpp \
                          *.hh \
