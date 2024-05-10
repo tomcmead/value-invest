@@ -6,7 +6,7 @@
 namespace
 {
     const long kHttp_bad_request = 300;
-    const long kCurl_timeout_ms = 5000;
+    const long kCurl_timeout_ms = 50000;
 }
 
 CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
@@ -62,6 +62,7 @@ void CurlHandler::DeleteInstance()
 
 /// @brief Execute HTTP GET request for target URL
 /// @param url target URL address
+/// @param response reference to GET response string
 /// @return HTTP status code
 long CurlHandler::PerformHttpGet(std::string url, std::string &response) const
 {

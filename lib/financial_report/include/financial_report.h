@@ -6,7 +6,7 @@ enum FinancialReportType
     kIncomeStatement
 };
 
-/// @brief Financial data base structure
+/// @brief Financial report base structure
 struct FinancialReport
 {
 public:

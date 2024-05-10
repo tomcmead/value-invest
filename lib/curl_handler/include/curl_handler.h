@@ -3,7 +3,7 @@
 #include <curl/curl.h>
 #include <string>
 
-/// @brief cURL library API handler.
+/// @brief cURL library API handler
 /// 'Singleton' and 'Facade' design patterns
 class CurlHandler
 {

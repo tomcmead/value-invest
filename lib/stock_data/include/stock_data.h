@@ -12,8 +12,7 @@ namespace stock_data_api
     const std::string kIncome_statement_api = "https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=";
 }
 
-/// @brief Get historical stock data
-/// 'facade' for 'Alpha Vantage API' financial data
+/// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data
 class StockData
 {
 public:
