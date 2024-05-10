@@ -26,8 +26,9 @@ private:
     CurlHandler* curl_handle;
     std::string alpha_vantage_api_key;
 
-    std::string GetApiFundamentalData(std::string symbol,
-        FinancialReportType report_type);
+    bool GetApiFundamentalData(std::string symbol,
+        FinancialReportType report_type,
+        std::string& api_response);
     template<typename TFinancialType>
     bool ParseFundamentalData(std::string fundamental_data,
         FinancialReportType report_type,
@@ -45,6 +46,7 @@ bool StockData::GetFinancialData(std::string symbol,
     TFinancialType& financial_data)
 {
     spdlog::info("StockData::GetFinancialData");
+    std::string fundamental_data;
 
     if(alpha_vantage_api_key.empty() == true)
     {
@@ -52,7 +54,7 @@ bool StockData::GetFinancialData(std::string symbol,
         return 0;
     }
 
-    std::string fundamental_data = GetApiFundamentalData(symbol, report_type);
+    GetApiFundamentalData(symbol, report_type, fundamental_data);
     return ParseFundamentalData<TFinancialType>(fundamental_data, report_type, financial_data);
 }
 

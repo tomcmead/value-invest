@@ -6,8 +6,7 @@
 #include <vector>
 #include "income_statement.h"
 
-/// @brief Parse JSON data using templated functions
-/// 'adapter' design pattern converts json string into FinanicalData struct
+/// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
 {
 public:
@@ -75,7 +74,6 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
         spdlog::critical("JsonParser::ParseData ", e.what());
         return 1;
     }
-    
 
     return 0;
 }

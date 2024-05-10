@@ -27,14 +27,15 @@ StockData::StockData()
 /// @brief Gets raw API JSON data response as string
 /// @param symbol stock ticker
 /// @param report_type enum of finanical data type
-/// @return API JSON string response
-std::string StockData::GetApiFundamentalData(std::string symbol,
-    FinancialReportType report_type)
+/// @param http_response API JSON string response
+/// @return bool 0=success, 1=fail
+bool StockData::GetApiFundamentalData(std::string symbol,
+    FinancialReportType report_type,
+    std::string& api_response)
 {
     spdlog::info("StockData::GetApiFinancialData");
 
     std::string api_instruction = "";
-    std::string http_response = "";
 
     switch(report_type)
     {
@@ -47,7 +48,7 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
 
     try
     {
-        long http_code = curl_handle->PerformHttpGet(api_instruction, http_response);
+        long http_code = curl_handle->PerformHttpGet(api_instruction, api_response);
         if(http_code != stock_data_api::kHttp_ok)
         {
             std::runtime_error("StockData::GetApiFinancialData " + symbol +
@@ -58,8 +59,8 @@ std::string StockData::GetApiFundamentalData(std::string symbol,
     catch(const std::exception& e)
     {
         spdlog::critical(e.what());
-        return "";
+        return 1;
     }
     spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(report_type));
-    return http_response;
+    return 0;
 }
