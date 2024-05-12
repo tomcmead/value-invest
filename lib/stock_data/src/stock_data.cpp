@@ -42,6 +42,12 @@ bool StockData::GetApiFundamentalData(std::string symbol,
         case kIncomeStatement:
             api_instruction.append(stock_data_api::kIncome_statement_api);
             break;
+        case kBalanceSheet:
+            api_instruction.append(stock_data_api::kBalance_sheet_api);
+            break;
+        default:
+            spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
+            return 1;
     }
     api_instruction.append(symbol);
     api_instruction.append("&apikey=" + alpha_vantage_api_key);

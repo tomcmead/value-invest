@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "income_statement.h"
+#include "balance_sheet.h"
 
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
@@ -63,7 +64,12 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
 
             for(int i=0; i<financial_data.financials.size(); i++)
             {
-                long data = std::stol(annual_report[financial_data.financial_names[i].c_str()].GetString());
+                std::string data_str = annual_report[financial_data.financial_names[i].c_str()].GetString();
+                long data = 0;
+                if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789")==data_str.size())
+                {
+                    data = std::stol(data_str);
+                }
                 financial_data.financials[i]->insert(std::pair<int, long>(year, data));
             }
         }
@@ -71,7 +77,7 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
     }
     catch(const std::exception& e)
     {
-        spdlog::critical("JsonParser::ParseData ", e.what());
+        spdlog::critical("JsonParser::ParseData {}", e.what());
         return 1;
     }
 

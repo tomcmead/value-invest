@@ -3,7 +3,8 @@
 /// @brief Enumerate list of fundamental financial data types
 enum FinancialReportType
 {
-    kIncomeStatement
+    kIncomeStatement,
+    kBalanceSheet
 };
 
 /// @brief Financial report base structure
