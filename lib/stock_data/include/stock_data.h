@@ -2,7 +2,7 @@
 
 #include <string>
 #include "curl_handler.h"
-#include "financial_report.h"
+#include "financial_report_types.h"
 #include "json_parser.h"
 
 namespace stock_data_api

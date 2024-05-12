@@ -1,6 +1,6 @@
 #pragma once
 
-#include "financial_report.h"
+#include "financial_report_types.h"
 #include <map>
 #include <vector>
 

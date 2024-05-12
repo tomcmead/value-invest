@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.28.3)
 
 set(LIB_NAME
-    FinancialReport
+    FinancialReportTypes
 )
 
 project(${LIB_NAME})
 
 set(SRC_FILES
-    src/financial_report.cpp)
+    src/financial_report_types.cpp)
 
 add_library(${LIB_NAME} STATIC
     ${SRC_FILES})

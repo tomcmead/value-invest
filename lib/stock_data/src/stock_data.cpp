@@ -4,7 +4,7 @@
 #include "stock_data.h"
 #include "curl_handler.h"
 #include "income_statement.h"
-#include "financial_report.h"
+#include "financial_report_types.h"
 #include "json_parser.h"
 
 /// @brief Configure CurlHandler and Alpha Vantage API key
