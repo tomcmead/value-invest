@@ -5,7 +5,8 @@ enum FinancialReportType
 {
     kIncomeStatement,
     kBalanceSheet,
-    kCashFlow
+    kCashFlow,
+    kEarnings
 };
 
 /// @brief Financial report base structure

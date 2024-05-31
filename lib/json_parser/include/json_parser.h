@@ -7,6 +7,7 @@
 #include "income_statement.h"
 #include "balance_sheet.h"
 #include "cash_flow.h"
+#include "earnings.h"
 
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
@@ -55,9 +56,17 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
 {
     spdlog::info("JsonParser::ParseData");
 
+
     try
     {
-        const rapidjson::Value& annual_reports = json_document["annualReports"];
+        rapidjson::Value& annual_reports = json_document["annualEarnings"];
+
+        rapidjson::Value::ConstMemberIterator itr = json_document.FindMember("annualReports");
+        if (itr != json_document.MemberEnd())
+        {
+            annual_reports = json_document["annualReports"];
+        }
+
         for(auto& annual_report : annual_reports.GetArray())
         {
             std::string date_str = annual_report["fiscalDateEnding"].GetString();

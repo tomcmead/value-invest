@@ -12,6 +12,7 @@ namespace stock_data_api
     const std::string kIncome_statement_api = "https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=";
     const std::string kBalance_sheet_api = "https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=";
     const std::string kCash_flow_api = "https://www.alphavantage.co/query?function=CASH_FLOW&symbol=";
+    const std::string kEarnings_api = "https://www.alphavantage.co/query?function=EARNINGS&symbol=";
 }
 
 /// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data

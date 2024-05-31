@@ -47,6 +47,9 @@ bool StockData::GetApiFundamentalData(std::string symbol,
         case kCashFlow:
             api_instruction.append(stock_data_api::kCash_flow_api);
             break;
+        case kEarnings:
+            api_instruction.append(stock_data_api::kEarnings_api);
+            break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
             return 1;
