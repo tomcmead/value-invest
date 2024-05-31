@@ -6,6 +6,7 @@
 #include <vector>
 #include "income_statement.h"
 #include "balance_sheet.h"
+#include "cash_flow.h"
 
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
@@ -20,7 +21,7 @@ private:
         TFinacialReport& financial_data);
 };
 
-/// @brief Parse JSON income statement object to FinancialData type
+/// @brief Parse JSON FinancialReportType object to FinancialData type
 /// @tparam TFinacialType 
 /// @param financial_json string formatted JSON
 /// @param financial_data template function of FinancialType struct

@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include "stock_data.h"
 #include "curl_handler.h"
-#include "income_statement.h"
 #include "financial_report_types.h"
 #include "json_parser.h"
 
@@ -44,6 +43,9 @@ bool StockData::GetApiFundamentalData(std::string symbol,
             break;
         case kBalanceSheet:
             api_instruction.append(stock_data_api::kBalance_sheet_api);
+            break;
+        case kCashFlow:
+            api_instruction.append(stock_data_api::kCash_flow_api);
             break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
