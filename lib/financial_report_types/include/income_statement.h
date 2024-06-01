@@ -8,78 +8,54 @@
 struct IncomeStatement : public FinancialReport
 {
 public:
-    std::map<int, long> gross_profit;
-    std::map<int, long> total_revenue;
-    std::map<int, long> cost_of_revenue;
-    std::map<int, long> cost_of_goods_and_services_sold;
-    std::map<int, long> operating_income;
-    std::map<int, long> selling_general_and_administrative;
-    std::map<int, long> research_and_development;
-    std::map<int, long> operating_expenses;
-    std::map<int, long> investment_income_net;
-    std::map<int, long> net_interest_income;
-    std::map<int, long> interest_income;
-    std::map<int, long> interest_expense;
-    std::map<int, long> non_interest_income;
-    std::map<int, long> other_non_operating_income;
-    std::map<int, long> depreciation;
-    std::map<int, long> depreciation_and_amortization;
-    std::map<int, long> income_before_tax;
-    std::map<int, long> income_tax_expense;
-    std::map<int, long> interest_and_debt_expense;
-    std::map<int, long> net_income_from_continuing_operations;
-    std::map<int, long> comprehensive_income_net_of_tax;
-    std::map<int, long> ebit;
-    std::map<int, long> ebitda;
-    std::map<int, long> net_income;
-    const std::vector<std::map<int, long>*> financials = {
-        &gross_profit,
-        &total_revenue,
-        &cost_of_revenue,
-        &cost_of_goods_and_services_sold,
-        &operating_income,
-        &selling_general_and_administrative,
-        &research_and_development,
-        &operating_expenses,
-        &investment_income_net,
-        &net_interest_income,
-        &interest_income,
-        &interest_expense,
-        &non_interest_income,
-        &other_non_operating_income,
-        &depreciation,
-        &depreciation_and_amortization,
-        &income_before_tax,
-        &income_tax_expense,
-        &interest_and_debt_expense,
-        &net_income_from_continuing_operations,
-        &comprehensive_income_net_of_tax,
-        &ebit,
-        &ebitda,
-        &net_income};
-    const std::vector<std::string> financial_names = {
-        "grossProfit",
-        "totalRevenue",
-        "costOfRevenue",
-        "costofGoodsAndServicesSold",
-        "operatingIncome",
-        "sellingGeneralAndAdministrative",
-        "researchAndDevelopment",
-        "operatingExpenses",
-        "investmentIncomeNet",
-        "netInterestIncome",
-        "interestIncome",
-        "interestExpense",
-        "nonInterestIncome",
-        "otherNonOperatingIncome",
-        "depreciation",
-        "depreciationAndAmortization",
-        "incomeBeforeTax",
-        "incomeTaxExpense",
-        "interestAndDebtExpense",
-        "netIncomeFromContinuingOperations",
-        "comprehensiveIncomeNetOfTax",
-        "ebit",
-        "ebitda",
-        "netIncome"};
+    std::map<int, float> gross_profit;
+    std::map<int, float> total_revenue;
+    std::map<int, float> cost_of_revenue;
+    std::map<int, float> cost_of_goods_and_services_sold;
+    std::map<int, float> operating_income;
+    std::map<int, float> selling_general_and_administrative;
+    std::map<int, float> research_and_development;
+    std::map<int, float> operating_expenses;
+    std::map<int, float> investment_income_net;
+    std::map<int, float> net_interest_income;
+    std::map<int, float> interest_income;
+    std::map<int, float> interest_expense;
+    std::map<int, float> non_interest_income;
+    std::map<int, float> other_non_operating_income;
+    std::map<int, float> depreciation;
+    std::map<int, float> depreciation_and_amortization;
+    std::map<int, float> income_before_tax;
+    std::map<int, float> income_tax_expense;
+    std::map<int, float> interest_and_debt_expense;
+    std::map<int, float> net_income_from_continuing_operations;
+    std::map<int, float> comprehensive_income_net_of_tax;
+    std::map<int, float> ebit;
+    std::map<int, float> ebitda;
+    std::map<int, float> net_income;
+
+    const std::vector<std::pair<std::string, std::map<int, float>*>> financials = {
+        std::make_pair("grossProfit", &gross_profit),
+        std::make_pair("totalRevenue", &total_revenue),
+        std::make_pair("costOfRevenue", &cost_of_revenue),
+        std::make_pair("costofGoodsAndServicesSold", &cost_of_goods_and_services_sold),
+        std::make_pair("operatingIncome", &operating_income),
+        std::make_pair("sellingGeneralAndAdministrative", &selling_general_and_administrative),
+        std::make_pair("researchAndDevelopment", &research_and_development),
+        std::make_pair("operatingExpenses", &operating_expenses),
+        std::make_pair("investmentIncomeNet", &investment_income_net),
+        std::make_pair("netInterestIncome", &net_interest_income),
+        std::make_pair("interestIncome", &interest_income),
+        std::make_pair("interestExpense", &interest_expense),
+        std::make_pair("nonInterestIncome", &non_interest_income),
+        std::make_pair("otherNonOperatingIncome", &other_non_operating_income),
+        std::make_pair("depreciation", &depreciation),
+        std::make_pair("depreciationAndAmortization", &depreciation_and_amortization),
+        std::make_pair("incomeBeforeTax", &income_before_tax),
+        std::make_pair("incomeTaxExpense", &income_tax_expense),
+        std::make_pair("interestAndDebtExpense", &interest_and_debt_expense),
+        std::make_pair("netIncomeFromContinuingOperations", &net_income_from_continuing_operations),
+        std::make_pair("comprehensiveIncomeNetOfTax", &comprehensive_income_net_of_tax),
+        std::make_pair("ebit", &ebit),
+        std::make_pair("ebitda", &ebitda),
+        std::make_pair("netIncome", &net_income)};
 };

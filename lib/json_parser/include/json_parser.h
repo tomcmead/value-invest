@@ -56,7 +56,6 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
 {
     spdlog::info("JsonParser::ParseData");
 
-
     try
     {
         rapidjson::Value& annual_reports = json_document["annualEarnings"];
@@ -74,15 +73,16 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
 
             for(int i=0; i<financial_data.financials.size(); i++)
             {
-                std::string data_str = annual_report[financial_data.financial_names[i].c_str()].GetString();
-                long data = 0;
-                if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789")==data_str.size())
+                std::string data_str = annual_report[financial_data.financials[i].first.c_str()].GetString();
+                float data = 0;
+                if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789") == data_str.size())
                 {
-                    data = std::stol(data_str);
+                    data = std::stof(data_str);
                 }
-                financial_data.financials[i]->insert(std::pair<int, long>(year, data));
+                financial_data.financials[i].second->insert(std::pair<int, float>(year, data));
             }
         }
+
         financial_data.valid = true;
     }
     catch(const std::exception& e)

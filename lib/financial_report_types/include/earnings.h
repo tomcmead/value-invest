@@ -4,14 +4,13 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <utility>
 
 /// @brief Earnings data structure
 struct Earnings : public FinancialReport
 {
 public:
-    std::map<int, long> eps;
-    const std::vector<std::map<int, long>*> financials = {
-        &eps};
-    const std::vector<std::string> financial_names = {
-        "reportedEPS"};
+    std::map<int, float> eps;
+    const std::vector<std::pair<std::string, std::map<int, float>*>> financials = {
+        std::make_pair("reportedEPS", &eps)};
 };
