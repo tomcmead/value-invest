@@ -11,6 +11,9 @@ set(SRC_DIR
 set(LIB_DIR
     lib
 )
+set(TEST_DIR
+    test
+)
 set(DOC_DIR
     docs
 )
@@ -44,11 +47,11 @@ add_executable(${PROJECT_NAME} ${SRC})
 find_package(SQLite3 REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl_handler/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_data/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/json_parser/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/stock_valuation/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/financial_report_types/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/curl_handler/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/stock_data/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/json_parser/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/stock_valuation/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/financial_report_types/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
@@ -60,4 +63,18 @@ project(${TEST_NAME})
 
 add_subdirectory(tests)
 enable_testing()
-add_test(${TEST_NAME} ${TEST_NAME})
+
+add_executable(
+    ${TEST_NAME}
+    ${LIB_DIR}/curl_handler/${TEST_DIR}/curl_handler_test.cpp
+)
+target_include_directories(${TEST_NAME} PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/curl_handler/include
+)
+target_link_libraries(
+    ${TEST_NAME}
+    PRIVATE
+    ${LIBS}
+    GTest::gtest_main
+)
