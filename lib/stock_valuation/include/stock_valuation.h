@@ -18,6 +18,8 @@ public:
     StockValuation();
     void DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent);
 private:
+    float ForecastFreeCashFlow(int year);
+
     StockData stock_data;
     IncomeStatement income_statement;
     BalanceSheet balance_sheet;
