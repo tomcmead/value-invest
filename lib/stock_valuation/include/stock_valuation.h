@@ -5,13 +5,21 @@
 #include <string>
 #include <vector>
 
+namespace valuation_data{
+    const float kInterest_rate = 0.05;
+    const float kTax_rate = 0.21;
+    const float kRisk_free_rate = 0.043;
+    const float kPerpetual_growth_rate = 0.025;
+}
+
 class StockValuation
 {
 public:
-    StockValuation(std::string symbol);
+    StockValuation();
+    void DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent);
 private:
-    bool ComputeInvestedCapital();
-
     StockData stock_data;
+    IncomeStatement income_statement;
     BalanceSheet balance_sheet;
+    CashFlow cash_flow;
 };

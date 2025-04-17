@@ -6,45 +6,21 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cmath>
 
-StockValuation::StockValuation(std::string symbol)
+StockValuation::StockValuation()
 {
     spdlog::info("StockValuation::StockValuation");
-
-    stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
-    ComputeInvestedCapital();
 }
 
-bool StockValuation::ComputeInvestedCapital()
-{
-    spdlog::info("StockValuation::ComputeInvestedCapital");
+void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent){
+    spdlog::info("StockValuation::DiscountedCashFlow");
 
-    if(balance_sheet.valid == false)
-    {
-        return 1;
-    }
+    stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
+    stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
+    stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
 
-    for(auto content : balance_sheet.total_assets)
-    {
-        float operatingCurrentAssets =
-            balance_sheet.cash_and_cash_equivalents_at_carrying_value[content.first]
-            + balance_sheet.current_net_receivables[content.first]
-            + balance_sheet.inventory[content.first]
-            + balance_sheet.other_current_assets[content.first];
-
-        float operatingCurrentLiabilities =
-            balance_sheet.current_accounts_payable[content.first]
-            + balance_sheet.deferred_revenue[content.first];
-
-        float investedCapitalEquity =
-            operatingCurrentAssets - operatingCurrentLiabilities
-            + balance_sheet.property_plant_equipment[content.first]
-            + balance_sheet.capital_lease_obligations[content.first]
-            + balance_sheet.other_current_assets[content.first]
-            + balance_sheet.goodwill[content.first];
-
-        spdlog::info("{} {}", content.first, investedCapitalEquity);
-    }
-
-    return 0;
+    int year = 0;
+    for(auto content : income_statement.total_revenue)
+        year = content.first;
 }
