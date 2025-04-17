@@ -35,6 +35,13 @@ void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, i
     float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth_percent);
     float terminal_value = TerminalValue(forecast_years, forecast_free_cash, wacc);
     float enterprise_value = EnterpriseValue(forecast_years, forecast_free_cash, wacc, terminal_value);
+    float per_share_value = PerShareValue(year, enterprise_value);
+
+    spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
+    spdlog::info("WACC {} ", wacc);
+    spdlog::info("Terminal Value {} ", terminal_value);
+    spdlog::info("Enterprise Value {} ", enterprise_value);
+    spdlog::info("Per Share Value {} ", per_share_value);
 }
 
 /// @brief forecast the first year of future cash flow
@@ -112,4 +119,17 @@ float StockValuation::EnterpriseValue(int forecast_years, float forecast_fcf, fl
     enterprise_value += terminal_value;
 
     return enterprise_value;
+}
+
+/// @brief compute estimate of the per-share cost to acquire the entire company
+/// @param year the start year
+/// @param enterprise_value total value
+/// @return float per share value
+float StockValuation::PerShareValue(int year, float enterprise_value){
+    spdlog::info("StockValuation::PerShareValue");
+
+    float net_debt = balance_sheet.short_term_debt[year] + balance_sheet.long_term_debt[year];
+    float equity_value = enterprise_value - net_debt;
+
+    return equity_value / balance_sheet.common_stock_shares_outstanding[year];
 }
