@@ -17,7 +17,7 @@ StockValuation::StockValuation()
 ///         Per Share Value of company
 /// @param symbol stock ticker
 /// @param share_price current share price
-/// @param forecast_year period in years the value of share price to be
+/// @param forecast_years period in years the value of share price to be
 /// @param share_beta company volatility metric
 /// @param growth_percent estimated year-on-year growth of company
 void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent){
@@ -33,6 +33,7 @@ void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, i
 
     float forecast_free_cash = ForecastFreeCashFlow(year);
     float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth_percent);
+    float terminal_value = TerminalValue(forecast_years, forecast_free_cash, wacc);
 }
 
 /// @brief forecast the first year of future cash flow
@@ -71,4 +72,19 @@ float StockValuation::WeightedAverageCostofCapital(int year, float share_price, 
 
 float StockValuation::MarketCap(float share_price, int common_share_outstanding){
     return share_price * common_share_outstanding;
+}
+
+/// @brief estimated value beyond a forecast period into perpetuity
+/// @param forecast_years period in years the value of share price to be
+/// @param forecast_fcf forecasted first year free cash flow value
+/// @param wacc Weighted Average Cost of Capital (WACC)
+/// @return float terminal value
+float StockValuation::TerminalValue(int forecast_years, float forecast_fcf, float wacc){
+    spdlog::info("StockValuation::TerminalValue");
+
+    for(int i=0; i<forecast_years; i++)
+        forecast_fcf *= valuation_data::kPerpetual_growth_rate;
+
+    return (forecast_fcf * (1 + valuation_data::kPerpetual_growth_rate)) /
+        (wacc - valuation_data::kPerpetual_growth_rate);
 }

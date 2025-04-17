@@ -21,6 +21,7 @@ private:
     float ForecastFreeCashFlow(int year);
     float WeightedAverageCostofCapital(int year, float share_price, float share_beta, float growth);
     float MarketCap(float share_price, int common_share_outstanding);
+    float TerminalValue(int forecast_years, float forecast_fcf, float wacc);
 
     StockData stock_data;
     IncomeStatement income_statement;
