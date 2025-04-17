@@ -32,8 +32,10 @@ void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, i
         year = content.first;
 
     float forecast_free_cash = ForecastFreeCashFlow(year);
+    float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth_percent);
 }
 
+/// @brief forecast the first year of future cash flow
 /// @param year the start year of forecast
 /// @return float forecasted free cash flow value
 float StockValuation::ForecastFreeCashFlow(int year){
@@ -45,4 +47,28 @@ float StockValuation::ForecastFreeCashFlow(int year){
     float capital_expenditures = cash_flow.capital_expenditures[year];
 
     return ebit * (1-valuation_data::kTax_rate) + depreciation_and_amortization - change_in_working_capital - capital_expenditures;
+}
+
+/// @brief compute WACC, the company's average after-tax cost of capital from all sources.
+///         It is the average rate that a company expects to pay to finance its business.
+/// @param year the start year
+/// @param share_price current share price
+/// @param share_beta company volatility metric
+/// @param growth_percent estimated year-on-year growth of company
+/// @return float Weighted Average Cost of Capital (WACC)
+float StockValuation::WeightedAverageCostofCapital(int year, float share_price, float share_beta, float growth){
+    spdlog::info("StockValuation::WeightedAverageCostofCapital");
+
+    float market_cap = MarketCap(share_price, balance_sheet.common_stock_shares_outstanding[year]);
+    float market_val_debt = balance_sheet.short_term_debt[year] + balance_sheet.long_term_debt[year];
+    float total_enterprise_value = market_cap + market_val_debt;
+    float cost_of_equity = valuation_data::kRisk_free_rate * share_beta * (growth-valuation_data::kRisk_free_rate);
+    float cost_of_debt = valuation_data::kInterest_rate * (1-valuation_data::kTax_rate);
+
+    return (market_cap/total_enterprise_value * cost_of_equity) +
+            market_val_debt/total_enterprise_value * cost_of_debt * (1-valuation_data::kTax_rate);
+}
+
+float StockValuation::MarketCap(float share_price, int common_share_outstanding){
+    return share_price * common_share_outstanding;
 }

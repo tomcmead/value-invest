@@ -19,6 +19,8 @@ public:
     void DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent);
 private:
     float ForecastFreeCashFlow(int year);
+    float WeightedAverageCostofCapital(int year, float share_price, float share_beta, float growth);
+    float MarketCap(float share_price, int common_share_outstanding);
 
     StockData stock_data;
     IncomeStatement income_statement;
