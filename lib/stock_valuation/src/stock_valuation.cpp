@@ -34,6 +34,7 @@ void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, i
     float forecast_free_cash = ForecastFreeCashFlow(year);
     float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth_percent);
     float terminal_value = TerminalValue(forecast_years, forecast_free_cash, wacc);
+    float enterprise_value = EnterpriseValue(forecast_years, forecast_free_cash, wacc, terminal_value);
 }
 
 /// @brief forecast the first year of future cash flow
@@ -87,4 +88,28 @@ float StockValuation::TerminalValue(int forecast_years, float forecast_fcf, floa
 
     return (forecast_fcf * (1 + valuation_data::kPerpetual_growth_rate)) /
         (wacc - valuation_data::kPerpetual_growth_rate);
+}
+
+/// @brief Compute companies enterprise (total) value.
+///         It is theoretical price an acquirer would pay to buy the entire business.
+/// @param forecast_years period in years the value of share price to be
+/// @param forecast_fcf forecasted first year free cash flow value
+/// @param wacc Weighted Average Cost of Capital (WACC)
+/// @param terminal_value estimated value beyond a forecast period into perpetuity
+/// @return float enterprise value
+float StockValuation::EnterpriseValue(int forecast_years, float forecast_fcf, float wacc, float terminal_value){
+    spdlog::info("StockValuation::EnterpriseValue");
+
+    float discount_cash_flow = forecast_fcf;
+    float enterprise_value = 0;
+
+    for(int i=1; i<=forecast_years; i++){
+        discount_cash_flow /= std::pow(1+wacc, i);
+        enterprise_value += discount_cash_flow;
+    }
+
+    terminal_value /= std::pow(1+wacc, forecast_years);
+    enterprise_value += terminal_value;
+
+    return enterprise_value;
 }
