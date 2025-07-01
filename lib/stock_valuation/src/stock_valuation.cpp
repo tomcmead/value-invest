@@ -1,10 +1,5 @@
-#include <spdlog/spdlog.h>
 #include "stock_valuation.h"
-#include "stock_data.h"
-#include "balance_sheet.h"
-
-#include <string>
-#include <vector>
+#include <spdlog/spdlog.h>
 #include <map>
 #include <cmath>
 

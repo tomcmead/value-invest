@@ -1,7 +1,5 @@
-#include <curl/curl.h>
-#include <spdlog/spdlog.h>
-#include <string>
 #include "curl_handler.h"
+#include <spdlog/spdlog.h>
 
 namespace
 {

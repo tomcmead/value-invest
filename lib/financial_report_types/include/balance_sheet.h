@@ -3,6 +3,7 @@
 #include "financial_report_types.h"
 #include <map>
 #include <vector>
+#include <string>
 
 /// @brief Balance sheet data structure
 struct BalanceSheet : public FinancialReport

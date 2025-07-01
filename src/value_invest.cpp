@@ -1,5 +1,4 @@
 #include "stock_valuation.h"
-#include "stock_data.h"
 
 int main()
 {

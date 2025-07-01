@@ -1,10 +1,5 @@
-#include <spdlog/spdlog.h>
-#include <string>
-#include <cstdlib>
 #include "stock_data.h"
-#include "curl_handler.h"
-#include "financial_report_types.h"
-#include "json_parser.h"
+#include <cstdlib>
 
 /// @brief Configure CurlHandler and Alpha Vantage API key
 StockData::StockData()

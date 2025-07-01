@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
 #include "curl_handler.h"
 #include "financial_report_types.h"
 #include "json_parser.h"
+#include <string>
 
 namespace stock_data_api
 {

@@ -1,13 +1,12 @@
 #pragma once
 
-#include <rapidjson/document.h>
-#include <spdlog/spdlog.h>
-#include <string>
-#include <vector>
 #include "income_statement.h"
 #include "balance_sheet.h"
 #include "cash_flow.h"
 #include "earnings.h"
+#include <rapidjson/document.h>
+#include <spdlog/spdlog.h>
+#include <string>
 
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
