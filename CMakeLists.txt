@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28.3)
+cmake_minimum_required(VERSION 3.22.1)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -23,7 +23,6 @@ set(SRC
 set(LIBS
     libcurl
     spdlog
-    SQLite::SQLite3
     CurlHandler
     StockData
     JsonParser
@@ -44,7 +43,6 @@ add_subdirectory(${DOC_DIR})
 add_subdirectory(${LIB_DIR})
 add_executable(${PROJECT_NAME} ${SRC})
 
-find_package(SQLite3 REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/curl_handler/include
