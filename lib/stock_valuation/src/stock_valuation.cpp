@@ -11,11 +11,8 @@ StockValuation::StockValuation()
 /// @brief Compute all steps of Discounted Cash Flow to determine
 ///         Per Share Value of company
 /// @param symbol stock ticker
-/// @param share_price current share price
-/// @param forecast_years period in years the value of share price to be
 /// @param share_beta company volatility metric
-/// @param growth_percent estimated year-on-year growth of company
-void StockValuation::DiscountedCashFlow(std::string symbol, int forecast_years, float share_beta, float growth_percent){
+void StockValuation::DiscountedCashFlow(std::string symbol, float share_beta){
     spdlog::info("StockValuation::DiscountedCashFlow");
 	
 	float share_price = 0;
@@ -23,18 +20,21 @@ void StockValuation::DiscountedCashFlow(std::string symbol, int forecast_years, 
     stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
     stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
     stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
+	stock_data.GetFinancialData<Earnings>(symbol, kEarnings, earnings);
 	stock_data.GetSharePrice(symbol, share_price);
 
     int year = 0;
     for(auto content : income_statement.total_revenue)
         year = content.first;
-
+	
+	float growth = GrowthValue(year);
     float forecast_free_cash = ForecastFreeCashFlow(year);
-    float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth_percent);
-    float terminal_value = TerminalValue(forecast_years, forecast_free_cash, wacc);
-    float enterprise_value = EnterpriseValue(forecast_years, forecast_free_cash, wacc, terminal_value);
+    float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth);
+    float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc);
+    float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
     float per_share_value = PerShareValue(year, enterprise_value);
 
+	spdlog::info("Growth: {}", growth);
     spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
     spdlog::info("WACC {} ", wacc);
     spdlog::info("Terminal Value {} ", terminal_value);
@@ -130,4 +130,40 @@ float StockValuation::PerShareValue(int year, float enterprise_value){
     float equity_value = enterprise_value - net_debt;
 
     return equity_value / balance_sheet.common_stock_shares_outstanding[year];
+}
+
+/// @brief compute estimate of the company growth
+/// @param int current year
+/// @return float per share value
+float StockValuation::GrowthValue(int curr_year){
+	spdlog::info("StockValuation::GrowthValue");
+	
+	int historical_years = valuation_data::kGrowth_years;
+	float growth = 0;
+	
+	if(income_statement.total_revenue.size() < valuation_data::kGrowth_years){
+		historical_years = income_statement.total_revenue.size();
+	}
+	
+	for(int year=curr_year-historical_years+1; year<curr_year; year++){
+		growth += PercentageIncrease(income_statement.total_revenue[year-1], income_statement.total_revenue[year]);
+		growth += PercentageIncrease(income_statement.gross_profit[year-1], income_statement.gross_profit[year]);
+		growth += PercentageIncrease(income_statement.net_income[year-1], income_statement.net_income[year]);
+		growth += PercentageIncrease(income_statement.operating_income[year-1], income_statement.operating_income[year]);
+		growth += PercentageIncrease(income_statement.ebitda[year-1], income_statement.ebitda[year]);
+		growth += PercentageIncrease(balance_sheet.total_assets[year-1], balance_sheet.total_assets[year]);
+		growth += PercentageIncrease(balance_sheet.total_shareholder_equity[year-1], balance_sheet.total_shareholder_equity[year]);
+		growth += PercentageIncrease(cash_flow.operating_cash_flow[year-1], cash_flow.operating_cash_flow[year]);
+		growth += PercentageIncrease(earnings.eps[year-1], earnings.eps[year]);
+	}
+	
+	return growth / ((historical_years-1)*9);
+}
+
+/// @brief compute percentage increase of 2 numbers
+/// @param float original value
+/// @param float new value
+/// @return float percent increase
+float StockValuation::PercentageIncrease(float start_val, float new_val){
+	return (new_val-start_val) / start_val;
 }
