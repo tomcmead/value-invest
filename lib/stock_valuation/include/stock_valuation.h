@@ -16,7 +16,7 @@ class StockValuation
 {
 public:
     StockValuation();
-    void DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent);
+    void DiscountedCashFlow(std::string symbol, int forecast_years, float share_beta, float growth_percent);
 private:
     float ForecastFreeCashFlow(int year);
     float WeightedAverageCostofCapital(int year, float share_price, float share_beta, float growth);
@@ -29,4 +29,5 @@ private:
     IncomeStatement income_statement;
     BalanceSheet balance_sheet;
     CashFlow cash_flow;
+	float share_price;
 };

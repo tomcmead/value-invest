@@ -28,6 +28,12 @@ bool StockData::GetApiFundamentalData(std::string symbol,
     std::string& api_response)
 {
     spdlog::info("StockData::GetApiFinancialData");
+	
+	 if(alpha_vantage_api_key.empty() == true)
+    {
+        spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
+        return 1;
+    }
 
     std::string api_instruction = "";
 
@@ -45,6 +51,9 @@ bool StockData::GetApiFundamentalData(std::string symbol,
         case kEarnings:
             api_instruction.append(stock_data_api::kEarnings_api);
             break;
+		case kSharePrice:
+			api_instruction.append(stock_data_api::kShare_price_api);
+			break;			
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
             return 1;
@@ -69,4 +78,26 @@ bool StockData::GetApiFundamentalData(std::string symbol,
     }
     spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(report_type));
     return 0;
+}
+
+bool StockData::GetSharePrice(std::string symbol, float& share_price)
+{
+	spdlog::info("StockData::GetFinancialData");
+    std::string fundamental_data;
+
+    GetApiFundamentalData(symbol, kSharePrice, fundamental_data);
+	
+	if(fundamental_data.empty() == true)
+    {
+        spdlog::critical("StockData::ParseFundamentalData fundamental data empty");
+        return 1;
+    }
+
+    JsonParser json_parser;
+    bool parse_fail = json_parser.ParseSharePriceData(fundamental_data, share_price);
+    if(parse_fail == true)
+    {
+        spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
+    }
+	return 0;
 }

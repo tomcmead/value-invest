@@ -13,6 +13,7 @@ namespace stock_data_api
     const std::string kBalance_sheet_api = "https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=";
     const std::string kCash_flow_api = "https://www.alphavantage.co/query?function=CASH_FLOW&symbol=";
     const std::string kEarnings_api = "https://www.alphavantage.co/query?function=EARNINGS&symbol=";
+	const std::string kShare_price_api = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
 }
 
 /// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data
@@ -24,6 +25,7 @@ public:
     bool GetFinancialData(std::string symbol,
         FinancialReportType report_type,
         TFinancialType& financial_data);
+	bool GetSharePrice(std::string symbol, float& share_price);
 
 private:
     CurlHandler* curl_handle;
@@ -50,12 +52,6 @@ bool StockData::GetFinancialData(std::string symbol,
 {
     spdlog::info("StockData::GetFinancialData");
     std::string fundamental_data;
-
-    if(alpha_vantage_api_key.empty() == true)
-    {
-        spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
-        return 0;
-    }
 
     GetApiFundamentalData(symbol, report_type, fundamental_data);
     return ParseFundamentalData<TFinancialType>(fundamental_data, report_type, financial_data);

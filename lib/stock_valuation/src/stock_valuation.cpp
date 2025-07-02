@@ -15,12 +15,15 @@ StockValuation::StockValuation()
 /// @param forecast_years period in years the value of share price to be
 /// @param share_beta company volatility metric
 /// @param growth_percent estimated year-on-year growth of company
-void StockValuation::DiscountedCashFlow(std::string symbol, float share_price, int forecast_years, float share_beta, float growth_percent){
+void StockValuation::DiscountedCashFlow(std::string symbol, int forecast_years, float share_beta, float growth_percent){
     spdlog::info("StockValuation::DiscountedCashFlow");
+	
+	float share_price = 0;
 
     stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
     stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
     stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
+	stock_data.GetSharePrice(symbol, share_price);
 
     int year = 0;
     for(auto content : income_statement.total_revenue)
