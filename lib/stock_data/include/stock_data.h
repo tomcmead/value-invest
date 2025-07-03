@@ -14,6 +14,8 @@ namespace stock_data_api
     const std::string kCash_flow_api = "https://www.alphavantage.co/query?function=CASH_FLOW&symbol=";
     const std::string kEarnings_api = "https://www.alphavantage.co/query?function=EARNINGS&symbol=";
 	const std::string kShare_price_api = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
+	const std::string kBeta_api = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=";
+	enum MiscData {SharePrice, Beta};
 }
 
 /// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data
@@ -25,7 +27,7 @@ public:
     bool GetFinancialData(std::string symbol,
         FinancialReportType report_type,
         TFinancialType& financial_data);
-	bool GetSharePrice(std::string symbol, float& share_price);
+	bool GetMiscData(std::string symbol, float& data, stock_data_api::MiscData data_type);
 
 private:
     CurlHandler* curl_handle;

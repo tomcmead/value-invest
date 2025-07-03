@@ -17,6 +17,8 @@ public:
         TFinacialReport& financial_data);
 	bool ParseSharePriceData(std::string financial_json, 
         float& share_price);
+	bool ParseBetaData(std::string financial_json, 
+        float& beta);
 private:
     template <typename TFinacialReport>
     bool ParseData(rapidjson::Document& json_document, 

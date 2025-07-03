@@ -11,17 +11,18 @@ StockValuation::StockValuation()
 /// @brief Compute all steps of Discounted Cash Flow to determine
 ///         Per Share Value of company
 /// @param symbol stock ticker
-/// @param share_beta company volatility metric
-void StockValuation::DiscountedCashFlow(std::string symbol, float share_beta){
+void StockValuation::DiscountedCashFlow(std::string symbol){
     spdlog::info("StockValuation::DiscountedCashFlow");
 	
 	float share_price = 0;
+	float beta = 0;
 
     stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
     stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
     stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
 	stock_data.GetFinancialData<Earnings>(symbol, kEarnings, earnings);
-	stock_data.GetSharePrice(symbol, share_price);
+	stock_data.GetMiscData(symbol, share_price, stock_data_api::SharePrice);
+	stock_data.GetMiscData(symbol, beta, stock_data_api::Beta);
 
     int year = 0;
     for(auto content : income_statement.total_revenue)
@@ -29,12 +30,13 @@ void StockValuation::DiscountedCashFlow(std::string symbol, float share_beta){
 	
 	float growth = GrowthValue(year);
     float forecast_free_cash = ForecastFreeCashFlow(year);
-    float wacc = WeightedAverageCostofCapital(year, share_price, share_beta, growth);
+    float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth);
     float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc);
     float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
     float per_share_value = PerShareValue(year, enterprise_value);
 
 	spdlog::info("Growth: {}", growth);
+	spdlog::info("Beta: {}", beta);
     spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
     spdlog::info("WACC {} ", wacc);
     spdlog::info("Terminal Value {} ", terminal_value);

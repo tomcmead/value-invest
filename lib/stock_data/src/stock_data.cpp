@@ -53,7 +53,10 @@ bool StockData::GetApiFundamentalData(std::string symbol,
             break;
 		case kSharePrice:
 			api_instruction.append(stock_data_api::kShare_price_api);
-			break;			
+			break;
+		case kBeta:
+			api_instruction.append(stock_data_api::kBeta_api);
+			break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
             return 1;
@@ -80,7 +83,12 @@ bool StockData::GetApiFundamentalData(std::string symbol,
     return 0;
 }
 
-bool StockData::GetSharePrice(std::string symbol, float& share_price)
+/// @brief Gets miscellaneous stock data
+/// @param symbol stock ticker
+/// @param data to be received
+/// @param miscellaneous enum of data type
+/// @return bool 0=success, 1=fail
+bool StockData::GetMiscData(std::string symbol, float& data, stock_data_api::MiscData data_type)
 {
 	spdlog::info("StockData::GetFinancialData");
     std::string fundamental_data;
@@ -94,7 +102,15 @@ bool StockData::GetSharePrice(std::string symbol, float& share_price)
     }
 
     JsonParser json_parser;
-    bool parse_fail = json_parser.ParseSharePriceData(fundamental_data, share_price);
+	bool parse_fail = true;
+	switch(data_type){
+		case stock_data_api::SharePrice:
+			parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
+			break;
+		case stock_data_api::Beta:
+			parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
+	}
+
     if(parse_fail == true)
     {
         spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
