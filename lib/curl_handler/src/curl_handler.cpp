@@ -3,8 +3,8 @@
 
 namespace
 {
-    const long kHttp_bad_request = 300;
-    const long kCurl_timeout_ms = 50000;
+    constexpr long kHttp_bad_request = 300;
+    constexpr long kCurl_timeout_ms = 50000;
 }
 
 CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
@@ -62,7 +62,7 @@ void CurlHandler::DeleteInstance()
 /// @param url target URL address
 /// @param response reference to GET response string
 /// @return HTTP status code
-long CurlHandler::PerformHttpGet(std::string url, std::string &response) const
+long CurlHandler::PerformHttpGet(const std::string url, std::string &response) const
 {
     spdlog::info("CurlHandler::PerformHttpGet");
 
@@ -72,7 +72,7 @@ long CurlHandler::PerformHttpGet(std::string url, std::string &response) const
 
     try
     {
-        CURLcode curl_code = curl_easy_perform(curl_handle);
+        const CURLcode curl_code = curl_easy_perform(curl_handle);
         if(curl_code != CURLE_OK)
         {
             throw std::runtime_error("CurlHandler::PerformHttpGet CURL request failed with CURL Code: " + std::to_string(curl_code));

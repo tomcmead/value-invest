@@ -13,11 +13,11 @@ class JsonParser
 {
 public:
     template <typename TFinacialReport>
-    bool GetFinancial(std::string financial_json, 
+    bool GetFinancial(const std::string financial_json, 
         TFinacialReport& financial_data);
-	bool ParseSharePriceData(std::string financial_json, 
+    bool ParseSharePriceData(const std::string financial_json, 
         float& share_price);
-	bool ParseBetaData(std::string financial_json, 
+    bool ParseBetaData(const std::string financial_json, 
         float& beta);
 private:
     template <typename TFinacialReport>
@@ -31,7 +31,7 @@ private:
 /// @param financial_data template function of FinancialType struct
 /// @return bool 0=success, 1=fail
 template <typename TFinacialReport>
-bool JsonParser::GetFinancial(std::string financial_json, 
+bool JsonParser::GetFinancial(const std::string financial_json, 
         TFinacialReport& financial_data)
 {
     spdlog::info("JsonParser::GetFinancial");

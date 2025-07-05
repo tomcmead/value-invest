@@ -21,15 +21,15 @@ StockData::StockData()
 /// @brief Gets raw API JSON data response as string
 /// @param symbol stock ticker
 /// @param report_type enum of finanical data type
-/// @param http_response API JSON string response
+/// @param api_response API JSON string response
 /// @return bool 0=success, 1=fail
-bool StockData::GetApiFundamentalData(std::string symbol,
+bool StockData::GetApiFundamentalData(const std::string symbol,
     FinancialReportType report_type,
     std::string& api_response)
 {
     spdlog::info("StockData::GetApiFinancialData");
-	
-	 if(alpha_vantage_api_key.empty() == true)
+
+    if(alpha_vantage_api_key.empty() == true)
     {
         spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
         return 1;
@@ -51,12 +51,12 @@ bool StockData::GetApiFundamentalData(std::string symbol,
         case kEarnings:
             api_instruction.append(stock_data_api::kEarnings_api);
             break;
-		case kSharePrice:
-			api_instruction.append(stock_data_api::kShare_price_api);
-			break;
-		case kBeta:
-			api_instruction.append(stock_data_api::kBeta_api);
-			break;
+        case kSharePrice:
+            api_instruction.append(stock_data_api::kShare_price_api);
+            break;
+        case kBeta:
+            api_instruction.append(stock_data_api::kBeta_api);
+            break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
             return 1;
@@ -86,34 +86,35 @@ bool StockData::GetApiFundamentalData(std::string symbol,
 /// @brief Gets miscellaneous stock data
 /// @param symbol stock ticker
 /// @param data to be received
-/// @param miscellaneous enum of data type
+/// @param data_type miscellaneous enum of data type
 /// @return bool 0=success, 1=fail
-bool StockData::GetMiscData(std::string symbol, float& data, stock_data_api::MiscData data_type)
+bool StockData::GetMiscData(const std::string symbol, float& data, stock_data_api::MiscData data_type)
 {
-	spdlog::info("StockData::GetFinancialData");
+    spdlog::info("StockData::GetFinancialData");
     std::string fundamental_data;
 
-    GetApiFundamentalData(symbol, kSharePrice, fundamental_data);
-	
-	if(fundamental_data.empty() == true)
+    if(data_type == stock_data_api::SharePrice)
+        GetApiFundamentalData(symbol, kSharePrice, fundamental_data);
+    else if(data_type == stock_data_api::Beta)
+        GetApiFundamentalData(symbol, kBeta, fundamental_data);
+
+    if(fundamental_data.empty() == true)
     {
         spdlog::critical("StockData::ParseFundamentalData fundamental data empty");
         return 1;
     }
 
     JsonParser json_parser;
-	bool parse_fail = true;
-	switch(data_type){
-		case stock_data_api::SharePrice:
-			parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
-			break;
-		case stock_data_api::Beta:
-			parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
-	}
+
+    bool parse_fail = true;
+    if(data_type == stock_data_api::SharePrice)
+        parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
+    else if(data_type == stock_data_api::Beta)
+        parse_fail = json_parser.ParseBetaData(fundamental_data, data);
 
     if(parse_fail == true)
     {
         spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
     }
-	return 0;
+    return 0;
 }

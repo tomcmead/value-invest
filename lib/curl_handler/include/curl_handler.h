@@ -14,7 +14,7 @@ public:
     static CurlHandler* GetInstance();
     static void DeleteInstance();
 
-    long PerformHttpGet(std::string url, std::string& response) const;
+    long PerformHttpGet(const std::string url, std::string& response) const;
 private:
     CurlHandler();
     static size_t CurlWriteCallback(void *contents, size_t size, size_t nmemb, void *userp);

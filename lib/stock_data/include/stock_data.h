@@ -7,15 +7,15 @@
 
 namespace stock_data_api
 {
-    const long kHttp_ok = 200;
+    constexpr long kHttp_ok = 200;
     const std::string kAlpha_vantage_api_key_env_var = "ALPHA_VANTAGE_API_KEY";
     const std::string kIncome_statement_api = "https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=";
     const std::string kBalance_sheet_api = "https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=";
     const std::string kCash_flow_api = "https://www.alphavantage.co/query?function=CASH_FLOW&symbol=";
     const std::string kEarnings_api = "https://www.alphavantage.co/query?function=EARNINGS&symbol=";
-	const std::string kShare_price_api = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
-	const std::string kBeta_api = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=";
-	enum MiscData {SharePrice, Beta};
+    const std::string kShare_price_api = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
+    const std::string kBeta_api = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=";
+    enum MiscData {SharePrice, Beta};
 }
 
 /// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data
@@ -24,20 +24,20 @@ class StockData
 public:
     StockData();
     template<typename TFinancialType>
-    bool GetFinancialData(std::string symbol,
+    bool GetFinancialData(const std::string symbol,
         FinancialReportType report_type,
         TFinancialType& financial_data);
-	bool GetMiscData(std::string symbol, float& data, stock_data_api::MiscData data_type);
+    bool GetMiscData(const std::string symbol, float& data, stock_data_api::MiscData data_type);
 
 private:
     CurlHandler* curl_handle;
     std::string alpha_vantage_api_key;
 
-    bool GetApiFundamentalData(std::string symbol,
+    bool GetApiFundamentalData(const std::string symbol,
         FinancialReportType report_type,
         std::string& api_response);
     template<typename TFinancialType>
-    bool ParseFundamentalData(std::string fundamental_data,
+    bool ParseFundamentalData(const std::string fundamental_data,
         FinancialReportType report_type,
         TFinancialType& financial_data);
 };
@@ -48,7 +48,7 @@ private:
 /// @param financial_data reference to FinancialData
 /// @return bool 0=success, 1=fail
 template<typename TFinancialType>
-bool StockData::GetFinancialData(std::string symbol,
+bool StockData::GetFinancialData(const std::string symbol,
     FinancialReportType report_type,
     TFinancialType& financial_data)
 {
