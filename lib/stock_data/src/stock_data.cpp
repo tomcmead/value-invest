@@ -9,12 +9,12 @@ StockData::StockData()
     curl_handle = CurlHandler::GetInstance();
     alpha_vantage_api_key = "";
 
-    if(std::getenv(stock_data_api::kAlpha_vantage_api_key_env_var.c_str()) == NULL)
+    if(std::getenv(stock_data::kAlpha_vantage_api_key_env_var.c_str()) == NULL)
     {
-        spdlog::critical("StockData::StockData evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
+        spdlog::critical("StockData::StockData evironment variable '" + stock_data::kAlpha_vantage_api_key_env_var + "' is not set");
         return;
     }
-    alpha_vantage_api_key = std::getenv(stock_data_api::kAlpha_vantage_api_key_env_var.c_str());
+    alpha_vantage_api_key = std::getenv(stock_data::kAlpha_vantage_api_key_env_var.c_str());
     spdlog::info("StockData::StockData Alpha Vantage API Key: {}", alpha_vantage_api_key);
 }
 
@@ -31,7 +31,7 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
 
     if(alpha_vantage_api_key.empty() == true)
     {
-        spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data_api::kAlpha_vantage_api_key_env_var + "' is not set");
+        spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data::kAlpha_vantage_api_key_env_var + "' is not set");
         return 1;
     }
 
@@ -40,22 +40,22 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
     switch(report_type)
     {
         case kIncomeStatement:
-            api_instruction.append(stock_data_api::kIncome_statement_api);
+            api_instruction.append(stock_data::kIncome_statement_api);
             break;
         case kBalanceSheet:
-            api_instruction.append(stock_data_api::kBalance_sheet_api);
+            api_instruction.append(stock_data::kBalance_sheet_api);
             break;
         case kCashFlow:
-            api_instruction.append(stock_data_api::kCash_flow_api);
+            api_instruction.append(stock_data::kCash_flow_api);
             break;
         case kEarnings:
-            api_instruction.append(stock_data_api::kEarnings_api);
+            api_instruction.append(stock_data::kEarnings_api);
             break;
         case kSharePrice:
-            api_instruction.append(stock_data_api::kShare_price_api);
+            api_instruction.append(stock_data::kShare_price_api);
             break;
         case kBeta:
-            api_instruction.append(stock_data_api::kBeta_api);
+            api_instruction.append(stock_data::kBeta_api);
             break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
@@ -67,7 +67,7 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
     try
     {
         long http_code = curl_handle->PerformHttpGet(api_instruction, api_response);
-        if(http_code != stock_data_api::kHttp_ok)
+        if(http_code != stock_data::kHttp_ok)
         {
             std::runtime_error("StockData::GetApiFinancialData " + symbol +
                 " " + std::to_string(report_type) + " HTTP request failed with HTTP Code: "
@@ -88,14 +88,14 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
 /// @param data to be received
 /// @param data_type miscellaneous enum of data type
 /// @return bool 0=success, 1=fail
-bool StockData::GetMiscData(const std::string symbol, float& data, stock_data_api::MiscData data_type)
+bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::MiscData data_type)
 {
     spdlog::info("StockData::GetFinancialData");
     std::string fundamental_data;
 
-    if(data_type == stock_data_api::SharePrice)
+    if(data_type == stock_data::SharePrice)
         GetApiFundamentalData(symbol, kSharePrice, fundamental_data);
-    else if(data_type == stock_data_api::Beta)
+    else if(data_type == stock_data::Beta)
         GetApiFundamentalData(symbol, kBeta, fundamental_data);
 
     if(fundamental_data.empty() == true)
@@ -107,10 +107,10 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data_ap
     JsonParser json_parser;
 
     bool parse_fail = true;
-    if(data_type == stock_data_api::SharePrice)
-        parse_fail = json_parser.ParseSharePriceData(fundamental_data, data);
-    else if(data_type == stock_data_api::Beta)
-        parse_fail = json_parser.ParseBetaData(fundamental_data, data);
+    if(data_type == stock_data::SharePrice)
+        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::SharePrice, data);
+    else if(data_type == stock_data::Beta)
+        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::Beta, data);
 
     if(parse_fail == true)
     {

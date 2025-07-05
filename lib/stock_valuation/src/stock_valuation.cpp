@@ -17,32 +17,32 @@ void StockValuation::DiscountedCashFlow(const std::string symbol){
     float share_price = 0;
     float beta = 0;
 
-    // stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
-    // stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
-    // stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
-    // stock_data.GetFinancialData<Earnings>(symbol, kEarnings, earnings);
-    // stock_data.GetMiscData(symbol, share_price, stock_data_api::SharePrice);
-    stock_data.GetMiscData(symbol, beta, stock_data_api::Beta);
+    stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
+    stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
+    stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
+    stock_data.GetFinancialData<Earnings>(symbol, kEarnings, earnings);
+    stock_data.GetMiscData(symbol, share_price, stock_data::SharePrice);
+    stock_data.GetMiscData(symbol, beta, stock_data::Beta);
 
-    // int year = 0;
-    // for(auto content : income_statement.total_revenue)
-    //     year = content.first;
+    int year = 0;
+    for(auto content : income_statement.total_revenue)
+        year = content.first;
 
-    // const float growth = GrowthValue(year);
-    // const float forecast_free_cash = ForecastFreeCashFlow(year);
-    // const float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth);
-    // const float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc);
-    // const float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
-    // const float per_share_value = PerShareValue(year, enterprise_value);
+    const float growth = GrowthValue(year);
+    const float forecast_free_cash = ForecastFreeCashFlow(year);
+    const float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth);
+    const float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc);
+    const float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
+    const float per_share_value = PerShareValue(year, enterprise_value);
 
-    // spdlog::info("Growth: {}", growth);
-    // spdlog::info("Share Price: {}", share_price);
-    // spdlog::info("Beta: {}", beta);
-    // spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
-    // spdlog::info("WACC {} ", wacc);
-    // spdlog::info("Terminal Value {} ", terminal_value);
-    // spdlog::info("Enterprise Value {} ", enterprise_value);
-    // spdlog::info("Per Share Value {} ", per_share_value);
+    spdlog::info("Growth: {}", growth);
+    spdlog::info("Share Price: {}", share_price);
+    spdlog::info("Beta: {}", beta);
+    spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
+    spdlog::info("WACC {} ", wacc);
+    spdlog::info("Terminal Value {} ", terminal_value);
+    spdlog::info("Enterprise Value {} ", enterprise_value);
+    spdlog::info("Per Share Value {} ", per_share_value);
 }
 
 /// @brief forecast the first year of future cash flow

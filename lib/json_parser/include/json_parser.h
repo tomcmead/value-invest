@@ -8,6 +8,11 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
+namespace json_parser
+{
+    enum MiscParseData {SharePrice, Beta};
+}
+
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct
 class JsonParser
 {
@@ -15,10 +20,9 @@ public:
     template <typename TFinacialReport>
     bool GetFinancial(const std::string financial_json, 
         TFinacialReport& financial_data);
-    bool ParseSharePriceData(const std::string financial_json, 
+    bool ParseMiscData(const std::string financial_json,
+        json_parser::MiscParseData data_type,
         float& share_price);
-    bool ParseBetaData(const std::string financial_json, 
-        float& beta);
 private:
     template <typename TFinacialReport>
     bool ParseData(rapidjson::Document& json_document, 

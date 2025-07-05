@@ -5,7 +5,7 @@
 #include "json_parser.h"
 #include <string>
 
-namespace stock_data_api
+namespace stock_data
 {
     constexpr long kHttp_ok = 200;
     const std::string kAlpha_vantage_api_key_env_var = "ALPHA_VANTAGE_API_KEY";
@@ -27,7 +27,7 @@ public:
     bool GetFinancialData(const std::string symbol,
         FinancialReportType report_type,
         TFinancialType& financial_data);
-    bool GetMiscData(const std::string symbol, float& data, stock_data_api::MiscData data_type);
+    bool GetMiscData(const std::string symbol, float& data, stock_data::MiscData data_type);
 
 private:
     CurlHandler* curl_handle;
