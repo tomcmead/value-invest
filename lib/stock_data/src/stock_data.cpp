@@ -1,4 +1,5 @@
 #include "stock_data.h"
+#include "error_codes.h"
 #include <cstdlib>
 
 /// @brief Configure CurlHandler and Alpha Vantage API key
@@ -32,7 +33,7 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
     if(alpha_vantage_api_key.empty() == true)
     {
         spdlog::critical("StockData::GetFinancial evironment variable '" + stock_data::kAlpha_vantage_api_key_env_var + "' is not set");
-        return 1;
+        return error_codes::Fail;
     }
 
     std::string api_instruction = "";
@@ -59,7 +60,7 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
             break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
-            return 1;
+            return error_codes::Fail;
     }
     api_instruction.append(symbol);
     api_instruction.append("&apikey=" + alpha_vantage_api_key);
@@ -77,10 +78,10 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
     catch(const std::exception& e)
     {
         spdlog::critical(e.what());
-        return 1;
+        return error_codes::Fail;
     }
     spdlog::info("StockData::GetApiFinancialData {} {} HTTP GET request successful", symbol, std::to_string(report_type));
-    return 0;
+    return error_codes::Success;
 }
 
 /// @brief Gets miscellaneous stock data
@@ -94,14 +95,20 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
     std::string fundamental_data;
 
     if(data_type == stock_data::SharePrice)
-        GetApiFundamentalData(symbol, kSharePrice, fundamental_data);
+    {
+        if(GetApiFundamentalData(symbol, kSharePrice, fundamental_data) == error_codes::Fail)
+            return error_codes::Fail;
+    }
     else if(data_type == stock_data::Beta)
-        GetApiFundamentalData(symbol, kBeta, fundamental_data);
+    {
+        if(GetApiFundamentalData(symbol, kBeta, fundamental_data)  == error_codes::Fail)
+            return error_codes::Fail;
+    }
 
     if(fundamental_data.empty() == true)
     {
         spdlog::critical("StockData::ParseFundamentalData fundamental data empty");
-        return 1;
+        return error_codes::Fail;
     }
 
     JsonParser json_parser;
@@ -115,6 +122,7 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
     if(parse_fail == true)
     {
         spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
+        return error_codes::Fail;
     }
-    return 0;
+    return error_codes::Success;;
 }

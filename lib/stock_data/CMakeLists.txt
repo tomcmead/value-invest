@@ -21,4 +21,5 @@ target_link_libraries(${LIB_NAME} PRIVATE
     libcurl
     CurlHandler
     JsonParser
-    FinancialReportTypes)
+    FinancialReportTypes
+    ErrorCodes)

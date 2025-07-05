@@ -1,4 +1,5 @@
-#include <json_parser.h>
+#include "json_parser.h"
+#include "error_codes.h"
 
 /// @brief Parse RapidJson JSON data to SharePrice
 /// @param financial_json std::string
@@ -16,34 +17,35 @@ bool JsonParser::ParseMiscData(const std::string financial_json,
     if(json_document.Parse<0>(financial_json.c_str()).HasParseError())
     {
         spdlog::critical("JsonParser::ParseMiscData fundamental JSON data contains error");
-        return 1;
+        return error_codes::Fail;
     }
 
-    try
+    std::string data_str;
+
+    if(data_type==json_parser::SharePrice && json_document.HasMember("Global Quote"))
     {
-        std::string data_str;
-
-        if(data_type == json_parser::SharePrice)
-        {
-            const rapidjson::Value& price_type = json_document["Global Quote"];
-            data_str = price_type["05. price"].GetString();
-        }
-        else if(data_type == json_parser::Beta)
-        {
-            data_str = json_document["Beta"].GetString();
-        }
-        
-        if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789") == data_str.size())
-        {
-            share_price = std::stof(data_str);
-        }
-        return 0;
+        const rapidjson::Value& price_type = json_document["Global Quote"];
+        data_str = price_type["05. price"].GetString();
     }
-    catch(const std::exception& e)
+    else if(data_type==json_parser::Beta && json_document.HasMember("Beta"))
     {
-        spdlog::critical("JsonParser::ParseMiscData {}", e.what());
-        return 1;
+        data_str = json_document["Beta"].GetString();
+    }
+    else
+    {
+        spdlog::critical("JsonParser::ParseMiscData JSON data missing target member");
+        return error_codes::Fail;
+    }
+    
+    if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789") == data_str.size())
+    {
+        share_price = std::stof(data_str);
+    }
+    else
+    {
+        spdlog::critical("JsonParser::ParseMiscData JSON member invalid type");
+        return error_codes::Fail;
     }
 
-    return 0;
+    return error_codes::Success;
 }
