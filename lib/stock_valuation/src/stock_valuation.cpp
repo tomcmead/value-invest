@@ -35,10 +35,11 @@ bool StockValuation::DiscountedCashFlow(const std::string symbol){
     for(auto content : income_statement->total_revenue)
         year = content.first;
 
+    const float effective_tax_rate = income_statement->income_tax_expense[year] / income_statement->income_before_tax[year];
     const float growth = GrowthValue(year);
-    const float forecast_free_cash = ForecastFreeCashFlow(year);
-    const float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth);
-    const float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc);
+    const float forecast_free_cash = ForecastFreeCashFlow(year, effective_tax_rate);
+    const float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth, effective_tax_rate);
+    const float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc, growth);
     const float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
     const float per_share_value = PerShareValue(year, enterprise_value);
 
@@ -56,8 +57,9 @@ bool StockValuation::DiscountedCashFlow(const std::string symbol){
 
 /// @brief forecast the first year of future cash flow
 /// @param year the start year of forecast
+/// @param tax_rate company average tax rate
 /// @return float forecasted free cash flow value
-float StockValuation::ForecastFreeCashFlow(const int year){
+float StockValuation::ForecastFreeCashFlow(const int year, const float tax_rate){
     spdlog::info("StockValuation::ForecastFreeCashFlow");
 
     float ebit = income_statement->ebit[year];
@@ -65,7 +67,7 @@ float StockValuation::ForecastFreeCashFlow(const int year){
     float change_in_working_capital = cash_flow->change_in_cash_and_cash_equivalents[year];
     float capital_expenditures = cash_flow->capital_expenditures[year];
 
-    return ebit * (1-valuation_data::kTax_rate) + depreciation_and_amortization - change_in_working_capital - capital_expenditures;
+    return ebit * (1-tax_rate) + depreciation_and_amortization - change_in_working_capital - capital_expenditures;
 }
 
 /// @brief compute WACC, the company's average after-tax cost of capital from all sources.
@@ -74,18 +76,20 @@ float StockValuation::ForecastFreeCashFlow(const int year){
 /// @param share_price current share price
 /// @param share_beta company volatility metric
 /// @param growth estimated year-on-year growth of company
+/// @param tax_rate company average tax rate
 /// @return float Weighted Average Cost of Capital (WACC)
-float StockValuation::WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth){
+float StockValuation::WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth, const float tax_rate){
     spdlog::info("StockValuation::WeightedAverageCostofCapital");
 
     float market_cap = MarketCap(share_price, balance_sheet->common_stock_shares_outstanding[year]);
-    float market_val_debt = balance_sheet->short_term_debt[year] + balance_sheet->long_term_debt[year];
+    float market_val_debt = balance_sheet->short_long_term_debt_total[year];
     float total_enterprise_value = market_cap + market_val_debt;
     float cost_of_equity = valuation_data::kRisk_free_rate * share_beta * (growth-valuation_data::kRisk_free_rate);
-    float cost_of_debt = valuation_data::kInterest_rate * (1-valuation_data::kTax_rate);
+    float interest_rate = income_statement->interest_expense[year] / balance_sheet->short_long_term_debt_total[year];
+    float cost_of_debt = interest_rate * (1-tax_rate);
 
     return (market_cap/total_enterprise_value * cost_of_equity) +
-            market_val_debt/total_enterprise_value * cost_of_debt * (1-valuation_data::kTax_rate);
+            market_val_debt/total_enterprise_value * cost_of_debt * (1-tax_rate);
 }
 
 float StockValuation::MarketCap(const float share_price, const int common_share_outstanding) const{
@@ -96,15 +100,16 @@ float StockValuation::MarketCap(const float share_price, const int common_share_
 /// @param forecast_years period in years the value of share price to be
 /// @param forecast_fcf forecasted first year free cash flow value
 /// @param wacc Weighted Average Cost of Capital (WACC)
+/// @param growth estimate company growth YoY
 /// @return float terminal value
-float StockValuation::TerminalValue(const int forecast_years, float forecast_fcf, const float wacc){
+float StockValuation::TerminalValue(const int forecast_years, float forecast_fcf, const float wacc, const float growth){
     spdlog::info("StockValuation::TerminalValue");
 
     for(int i=0; i<forecast_years; i++)
-        forecast_fcf *= valuation_data::kPerpetual_growth_rate;
+        forecast_fcf *= growth;
 
-    return (forecast_fcf * (1 + valuation_data::kPerpetual_growth_rate)) /
-        (wacc - valuation_data::kPerpetual_growth_rate);
+    return (forecast_fcf * (1 + growth)) /
+        (wacc - growth);
 }
 
 /// @brief Compute companies enterprise (total) value.
@@ -167,7 +172,7 @@ float StockValuation::GrowthValue(const int curr_year){
         growth += PercentageIncrease(earnings->eps[year-1], earnings->eps[year]);
     }
 
-    return growth / ((historical_years-1)*9);
+    return growth / ((historical_years-1)*valuation_data::kGrowthVariables);
 }
 
 /// @brief compute percentage increase of 2 numbers
