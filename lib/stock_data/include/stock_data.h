@@ -24,9 +24,8 @@ class StockData
 public:
     StockData();
     template<typename TFinancialType>
-    bool GetFinancialData(const std::string symbol,
-        FinancialReportType report_type,
-        TFinancialType& financial_data);
+    std::unique_ptr<TFinancialType> GetFinancialData(const std::string symbol,
+        FinancialReportType report_type);
     bool GetMiscData(const std::string symbol, float& data, stock_data::MiscData data_type);
 
 private:
@@ -37,51 +36,49 @@ private:
         FinancialReportType report_type,
         std::string& api_response);
     template<typename TFinancialType>
-    bool ParseFundamentalData(const std::string fundamental_data,
-        FinancialReportType report_type,
-        TFinancialType& financial_data);
+    std::unique_ptr<TFinancialType> ParseFundamentalData(const std::string fundamental_data,
+        FinancialReportType report_type);
 };
 
 /// @brief Generate FinancialData struct of requested symbol and financial type
 /// @param symbol stock ticker
 /// @param report_type enum of finanical data type
-/// @param financial_data reference to FinancialData
-/// @return bool 0=success, 1=fail
+/// @return std::unique_ptr<TFinancialType> FinancialData struct
 template<typename TFinancialType>
-bool StockData::GetFinancialData(const std::string symbol,
-    FinancialReportType report_type,
-    TFinancialType& financial_data)
+std::unique_ptr<TFinancialType> StockData::GetFinancialData(const std::string symbol,
+    FinancialReportType report_type)
 {
     spdlog::info("StockData::GetFinancialData");
+
     std::string fundamental_data;
 
     GetApiFundamentalData(symbol, report_type, fundamental_data);
-    return ParseFundamentalData<TFinancialType>(fundamental_data, report_type, financial_data);
+    return ParseFundamentalData<TFinancialType>(fundamental_data, report_type);
 }
 
 /// @brief Convert raw JSON API string data to FinancialData struct
 /// @param fundamental_data JSON string
 /// @param report_type enum of finanical data type
-/// @param financial_data& reference to completed FinancialData struct
-/// @return bool 0=success, 1=fail
+/// @return std::unique_ptr<TFinancialType> FinancialData struct
 template<typename TFinancialType>
-bool StockData::ParseFundamentalData(std::string fundamental_data,
-    FinancialReportType report_type,
-    TFinancialType& financial_data)
+std::unique_ptr<TFinancialType> StockData::ParseFundamentalData(std::string fundamental_data,
+    FinancialReportType report_type)
 {
     spdlog::info("StockData::ParseFundamentalData");
 
     if(fundamental_data.empty() == true)
     {
         spdlog::critical("StockData::ParseFundamentalData fundamental data empty");
-        return 1;
+        return nullptr;
     }
 
     JsonParser json_parser;
-    bool parse_fail = json_parser.GetFinancial<TFinancialType>(fundamental_data, financial_data);
-    if(parse_fail == true)
+    std::unique_ptr<TFinancialType> financial_data = std::make_unique<TFinancialType>();
+    financial_data = json_parser.GetFinancial<TFinancialType>(fundamental_data);
+    if(financial_data == nullptr)
     {
         spdlog::critical("StockData::ParseFundamentalData JSON parsing failed");
+        return nullptr;
     }
-    return parse_fail;
+    return financial_data;
 }

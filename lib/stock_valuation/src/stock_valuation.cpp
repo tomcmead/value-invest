@@ -1,4 +1,5 @@
 #include "stock_valuation.h"
+#include "error_codes.h"
 #include <spdlog/spdlog.h>
 #include <map>
 #include <cmath>
@@ -11,21 +12,27 @@ StockValuation::StockValuation()
 /// @brief Compute all steps of Discounted Cash Flow to determine
 ///         Per Share Value of company
 /// @param symbol stock ticker
-void StockValuation::DiscountedCashFlow(const std::string symbol){
+/// @return bool success/fail
+bool StockValuation::DiscountedCashFlow(const std::string symbol){
     spdlog::info("StockValuation::DiscountedCashFlow");
 
     float share_price = 0;
     float beta = 0;
 
-    stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement, income_statement);
-    stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet, balance_sheet);
-    stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow, cash_flow);
-    stock_data.GetFinancialData<Earnings>(symbol, kEarnings, earnings);
+    income_statement = stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement);
+    balance_sheet = stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet);
+    cash_flow = stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow);
+    earnings = stock_data.GetFinancialData<Earnings>(symbol, kEarnings);
     stock_data.GetMiscData(symbol, share_price, stock_data::SharePrice);
     stock_data.GetMiscData(symbol, beta, stock_data::Beta);
 
+    if(income_statement==nullptr || balance_sheet==nullptr || cash_flow==nullptr || earnings==nullptr){
+         spdlog::critical("StockValuation::DiscountedCashFlow Financial Document NULL");
+         return error_codes::Fail;
+    }
+
     int year = 0;
-    for(auto content : income_statement.total_revenue)
+    for(auto content : income_statement->total_revenue)
         year = content.first;
 
     const float growth = GrowthValue(year);
@@ -43,6 +50,8 @@ void StockValuation::DiscountedCashFlow(const std::string symbol){
     spdlog::info("Terminal Value {} ", terminal_value);
     spdlog::info("Enterprise Value {} ", enterprise_value);
     spdlog::info("Per Share Value {} ", per_share_value);
+
+    return error_codes::Success;
 }
 
 /// @brief forecast the first year of future cash flow
@@ -51,10 +60,10 @@ void StockValuation::DiscountedCashFlow(const std::string symbol){
 float StockValuation::ForecastFreeCashFlow(const int year){
     spdlog::info("StockValuation::ForecastFreeCashFlow");
 
-    float ebit = income_statement.ebit[year];
-    float depreciation_and_amortization = income_statement.depreciation_and_amortization[year];
-    float change_in_working_capital = cash_flow.change_in_cash_and_cash_equivalents[year];
-    float capital_expenditures = cash_flow.capital_expenditures[year];
+    float ebit = income_statement->ebit[year];
+    float depreciation_and_amortization = income_statement->depreciation_and_amortization[year];
+    float change_in_working_capital = cash_flow->change_in_cash_and_cash_equivalents[year];
+    float capital_expenditures = cash_flow->capital_expenditures[year];
 
     return ebit * (1-valuation_data::kTax_rate) + depreciation_and_amortization - change_in_working_capital - capital_expenditures;
 }
@@ -69,8 +78,8 @@ float StockValuation::ForecastFreeCashFlow(const int year){
 float StockValuation::WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth){
     spdlog::info("StockValuation::WeightedAverageCostofCapital");
 
-    float market_cap = MarketCap(share_price, balance_sheet.common_stock_shares_outstanding[year]);
-    float market_val_debt = balance_sheet.short_term_debt[year] + balance_sheet.long_term_debt[year];
+    float market_cap = MarketCap(share_price, balance_sheet->common_stock_shares_outstanding[year]);
+    float market_val_debt = balance_sheet->short_term_debt[year] + balance_sheet->long_term_debt[year];
     float total_enterprise_value = market_cap + market_val_debt;
     float cost_of_equity = valuation_data::kRisk_free_rate * share_beta * (growth-valuation_data::kRisk_free_rate);
     float cost_of_debt = valuation_data::kInterest_rate * (1-valuation_data::kTax_rate);
@@ -79,7 +88,7 @@ float StockValuation::WeightedAverageCostofCapital(const int year, const float s
             market_val_debt/total_enterprise_value * cost_of_debt * (1-valuation_data::kTax_rate);
 }
 
-float StockValuation::MarketCap(const float share_price, const int common_share_outstanding){
+float StockValuation::MarketCap(const float share_price, const int common_share_outstanding) const{
     return share_price * common_share_outstanding;
 }
 
@@ -129,10 +138,10 @@ float StockValuation::EnterpriseValue(const int forecast_years, const float fore
 float StockValuation::PerShareValue(const int year, const float enterprise_value){
     spdlog::info("StockValuation::PerShareValue");
 
-    float net_debt = balance_sheet.short_term_debt[year] + balance_sheet.long_term_debt[year];
+    float net_debt = balance_sheet->short_term_debt[year] + balance_sheet->long_term_debt[year];
     float equity_value = enterprise_value - net_debt;
 
-    return equity_value / balance_sheet.common_stock_shares_outstanding[year];
+    return equity_value / balance_sheet->common_stock_shares_outstanding[year];
 }
 
 /// @brief compute estimate of the company growth
@@ -142,20 +151,20 @@ float StockValuation::GrowthValue(const int curr_year){
     spdlog::info("StockValuation::GrowthValue");
 
     float growth = 0;
-    const int historical_years = income_statement.total_revenue.size() < valuation_data::kGrowth_years ? 
-                                    income_statement.total_revenue.size() : valuation_data::kGrowth_years;
+    const int historical_years = income_statement->total_revenue.size() < valuation_data::kGrowth_years ? 
+                                    income_statement->total_revenue.size() : valuation_data::kGrowth_years;
 
     for(int year=curr_year-historical_years+1; year<curr_year; year++)
     {
-        growth += PercentageIncrease(income_statement.total_revenue[year-1], income_statement.total_revenue[year]);
-        growth += PercentageIncrease(income_statement.gross_profit[year-1], income_statement.gross_profit[year]);
-        growth += PercentageIncrease(income_statement.net_income[year-1], income_statement.net_income[year]);
-        growth += PercentageIncrease(income_statement.operating_income[year-1], income_statement.operating_income[year]);
-        growth += PercentageIncrease(income_statement.ebitda[year-1], income_statement.ebitda[year]);
-        growth += PercentageIncrease(balance_sheet.total_assets[year-1], balance_sheet.total_assets[year]);
-        growth += PercentageIncrease(balance_sheet.total_shareholder_equity[year-1], balance_sheet.total_shareholder_equity[year]);
-        growth += PercentageIncrease(cash_flow.operating_cash_flow[year-1], cash_flow.operating_cash_flow[year]);
-        growth += PercentageIncrease(earnings.eps[year-1], earnings.eps[year]);
+        growth += PercentageIncrease(income_statement->total_revenue[year-1], income_statement->total_revenue[year]);
+        growth += PercentageIncrease(income_statement->gross_profit[year-1], income_statement->gross_profit[year]);
+        growth += PercentageIncrease(income_statement->net_income[year-1], income_statement->net_income[year]);
+        growth += PercentageIncrease(income_statement->operating_income[year-1], income_statement->operating_income[year]);
+        growth += PercentageIncrease(income_statement->ebitda[year-1], income_statement->ebitda[year]);
+        growth += PercentageIncrease(balance_sheet->total_assets[year-1], balance_sheet->total_assets[year]);
+        growth += PercentageIncrease(balance_sheet->total_shareholder_equity[year-1], balance_sheet->total_shareholder_equity[year]);
+        growth += PercentageIncrease(cash_flow->operating_cash_flow[year-1], cash_flow->operating_cash_flow[year]);
+        growth += PercentageIncrease(earnings->eps[year-1], earnings->eps[year]);
     }
 
     return growth / ((historical_years-1)*9);

@@ -4,6 +4,7 @@
 #include "balance_sheet.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace valuation_data{
     constexpr float kInterest_rate = 0.05;
@@ -18,11 +19,11 @@ class StockValuation
 {
 public:
     StockValuation();
-    void DiscountedCashFlow(std::string symbol);
+    bool DiscountedCashFlow(std::string symbol);
 private:
     float ForecastFreeCashFlow(const int year);
     float WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth);
-    float MarketCap(float share_price, const int common_share_outstanding);
+    float MarketCap(float share_price, const int common_share_outstanding) const;
     float TerminalValue(const int forecast_years, float forecast_fcf, const float wacc);
     float EnterpriseValue(const int forecast_years, const float forecast_fcf, const float wacc, float terminal_value);
     float PerShareValue(const int year, const float enterprise_value);
@@ -30,8 +31,8 @@ private:
     float PercentageIncrease(const float start_val, const float new_val) const;
 
     StockData stock_data;
-    IncomeStatement income_statement;
-    BalanceSheet balance_sheet;
-    CashFlow cash_flow;
-    Earnings earnings;
+    std::unique_ptr<IncomeStatement> income_statement = std::make_unique<IncomeStatement>();
+    std::unique_ptr<BalanceSheet> balance_sheet = std::make_unique<BalanceSheet>();
+    std::unique_ptr<CashFlow> cash_flow = std::make_unique<CashFlow>();
+    std::unique_ptr<Earnings> earnings = std::make_unique<Earnings>();
 };

@@ -4,11 +4,11 @@
 /// @brief Parse RapidJson JSON data to SharePrice
 /// @param financial_json std::string
 /// @param data_type json_parser::MiscParseData
-/// @param share_price float&
-/// @return bool 0=success, 1=fail
+/// @param misc_data float& for misc_data result
+/// @return bool success/fail
 bool JsonParser::ParseMiscData(const std::string financial_json,
         json_parser::MiscParseData data_type,
-        float& share_price)
+        float& misc_data)
 {
     spdlog::info("JsonParser::ParseMiscData");
 
@@ -39,7 +39,7 @@ bool JsonParser::ParseMiscData(const std::string financial_json,
     
     if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789") == data_str.size())
     {
-        share_price = std::stof(data_str);
+        misc_data = std::stof(data_str);
     }
     else
     {

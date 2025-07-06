@@ -7,6 +7,7 @@
 #include <rapidjson/document.h>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <memory>
 
 namespace json_parser
 {
@@ -18,53 +19,50 @@ class JsonParser
 {
 public:
     template <typename TFinacialReport>
-    bool GetFinancial(const std::string financial_json, 
-        TFinacialReport& financial_data);
+    std::unique_ptr<TFinacialReport> GetFinancial(const std::string financial_json);
     bool ParseMiscData(const std::string financial_json,
         json_parser::MiscParseData data_type,
-        float& share_price);
+        float& misc_data);
 private:
     template <typename TFinacialReport>
-    bool ParseData(rapidjson::Document& json_document, 
-        TFinacialReport& financial_data);
+    std::unique_ptr<TFinacialReport> ParseData(rapidjson::Document& json_document);
 };
 
 /// @brief Parse JSON FinancialReportType object to FinancialData type
 /// @tparam TFinacialType 
 /// @param financial_json string formatted JSON
-/// @param financial_data template function of FinancialType struct
-/// @return bool 0=success, 1=fail
+/// @return std::unique_ptr<TFinancialType> FinancialData struct
 template <typename TFinacialReport>
-bool JsonParser::GetFinancial(const std::string financial_json, 
-        TFinacialReport& financial_data)
+std::unique_ptr<TFinacialReport> JsonParser::GetFinancial(const std::string financial_json)
 {
     spdlog::info("JsonParser::GetFinancial");
 
     rapidjson::Document json_document;
-    financial_data.valid = false;
 
     if(json_document.Parse<0>(financial_json.c_str()).HasParseError())
     {
         spdlog::critical("JsonParser::JsonParser fundamental JSON data contains error");
-        return 1;
+        return nullptr;
     }
 
-    return ParseData<TFinacialReport>(json_document, financial_data);
+    return ParseData<TFinacialReport>(json_document);
 }
 
 /// @brief Parse RapidJson JSON data to FinancialType struct
-/// @tparam TFinacialType 
-/// @param json_document 
-/// @param financial_data 
-/// @return bool 0=success, 1=fail
+/// @tparam TFinacialType
+/// @param json_document
+/// @return std::unique_ptr<TFinancialType> FinancialData struct
 template <typename TFinacialReport>
-bool JsonParser::ParseData(rapidjson::Document& json_document, 
-        TFinacialReport& financial_data)
+std::unique_ptr<TFinacialReport> JsonParser::ParseData(rapidjson::Document& json_document)
 {
     spdlog::info("JsonParser::ParseData");
 
+    std::unique_ptr<TFinacialReport> financial_data = std::make_unique<TFinacialReport>();
+
     try
     {
+        financial_data->valid = false;
+
         rapidjson::Value& annual_reports = json_document["annualEarnings"];
 
         rapidjson::Value::ConstMemberIterator itr = json_document.FindMember("annualReports");
@@ -78,25 +76,25 @@ bool JsonParser::ParseData(rapidjson::Document& json_document,
             std::string date_str = annual_report["fiscalDateEnding"].GetString();
             int year = std::stoi(date_str.substr(0,4));
 
-            for(int i=0; i<financial_data.financials.size(); i++)
+            for(int i=0; i<financial_data->financials.size(); i++)
             {
-                std::string data_str = annual_report[financial_data.financials[i].first.c_str()].GetString();
+                std::string data_str = annual_report[financial_data->financials[i].first.c_str()].GetString();
                 float data = 0;
                 if(!data_str.empty() && strspn(data_str.c_str(), "-.0123456789") == data_str.size())
                 {
                     data = std::stof(data_str);
                 }
-                financial_data.financials[i].second->insert(std::pair<int, float>(year, data));
+                financial_data->financials[i].second->insert(std::pair<int, float>(year, data));
             }
         }
 
-        financial_data.valid = true;
+        financial_data->valid = true;
     }
     catch(const std::exception& e)
     {
         spdlog::critical("JsonParser::ParseData {}", e.what());
-        return 1;
+        return nullptr;
     }
 
-    return 0;
+    return financial_data;
 }

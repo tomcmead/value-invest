@@ -23,7 +23,7 @@ StockData::StockData()
 /// @param symbol stock ticker
 /// @param report_type enum of finanical data type
 /// @param api_response API JSON string response
-/// @return bool 0=success, 1=fail
+/// @return bool success/fail
 bool StockData::GetApiFundamentalData(const std::string symbol,
     FinancialReportType report_type,
     std::string& api_response)
@@ -88,7 +88,7 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
 /// @param symbol stock ticker
 /// @param data to be received
 /// @param data_type miscellaneous enum of data type
-/// @return bool 0=success, 1=fail
+/// @return bool success/fail
 bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::MiscData data_type)
 {
     spdlog::info("StockData::GetFinancialData");
