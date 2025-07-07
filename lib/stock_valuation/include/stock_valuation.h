@@ -20,7 +20,7 @@ public:
     bool DiscountedCashFlow(std::string symbol);
 private:
     float ForecastFreeCashFlow(const int year, const float tax_rate);
-    float WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth, const float tax_rate);
+    float WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth, const float tax_rate, const float risk_free_rate);
     float MarketCap(float share_price, const int common_share_outstanding) const;
     float TerminalValue(const int forecast_years, float forecast_fcf, const float wacc, const float growth);
     float EnterpriseValue(const int forecast_years, const float forecast_fcf, const float wacc, float terminal_value);

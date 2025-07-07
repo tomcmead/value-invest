@@ -15,7 +15,8 @@ namespace stock_data
     const std::string kEarnings_api = "https://www.alphavantage.co/query?function=EARNINGS&symbol=";
     const std::string kShare_price_api = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
     const std::string kBeta_api = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=";
-    enum MiscData {SharePrice, Beta};
+    const std::string kRisk_free_rate_api = "https://www.alphavantage.co/query?function=TREASURY_YIELD&interval=daily&maturity=10year";
+    enum MiscData {SharePrice, Beta, RiskFreeRate};
 }
 
 /// @brief Get historical stock data. 'facade' for 'Alpha Vantage API' financial data

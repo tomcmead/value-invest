@@ -11,7 +11,7 @@
 
 namespace json_parser
 {
-    enum MiscParseData {SharePrice, Beta};
+    enum MiscParseData {SharePrice, Beta, RiskFreeRate};
 }
 
 /// @brief Parse JSON data using templated functions, 'adapter' design pattern converts json string into FinanicalData struct

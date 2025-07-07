@@ -58,11 +58,15 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
         case kBeta:
             api_instruction.append(stock_data::kBeta_api);
             break;
+        case kRiskFreeRate:
+            api_instruction.append(stock_data::kRisk_free_rate_api);
+            break;
         default:
             spdlog::critical("StockData::GetApiFinancialData FinancialReportType invalid");
             return error_codes::Fail;
     }
-    api_instruction.append(symbol);
+    if(report_type != kRiskFreeRate)
+        api_instruction.append(symbol);
     api_instruction.append("&apikey=" + alpha_vantage_api_key);
 
     try
@@ -104,6 +108,11 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
         if(GetApiFundamentalData(symbol, kBeta, fundamental_data)  == error_codes::Fail)
             return error_codes::Fail;
     }
+    else if(data_type == stock_data::RiskFreeRate)
+    {
+        if(GetApiFundamentalData(symbol, kRiskFreeRate, fundamental_data)  == error_codes::Fail)
+            return error_codes::Fail;
+    }
 
     if(fundamental_data.empty() == true)
     {
@@ -118,6 +127,8 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
         parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::SharePrice, data);
     else if(data_type == stock_data::Beta)
         parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::Beta, data);
+    else if(data_type == stock_data::RiskFreeRate)
+        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::RiskFreeRate, data);
 
     if(parse_fail == true)
     {

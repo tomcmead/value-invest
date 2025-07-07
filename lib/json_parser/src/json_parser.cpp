@@ -31,6 +31,12 @@ bool JsonParser::ParseMiscData(const std::string financial_json,
     {
         data_str = json_document["Beta"].GetString();
     }
+    else if(data_type==json_parser::RiskFreeRate && json_document.HasMember("data"))
+    {
+        const rapidjson::Value& val_array = json_document["data"];
+        const rapidjson::Value& val = val_array[0];
+        data_str = val["value"].GetString();
+    }
     else
     {
         spdlog::critical("JsonParser::ParseMiscData JSON data missing target member");

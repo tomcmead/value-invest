@@ -8,7 +8,8 @@ enum FinancialReportType
     kCashFlow,
     kEarnings,
     kSharePrice,
-    kBeta
+    kBeta,
+    kRiskFreeRate
 };
 
 /// @brief Financial report base structure
