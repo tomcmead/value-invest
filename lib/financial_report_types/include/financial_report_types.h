@@ -7,8 +7,8 @@ enum FinancialReportType
     kBalanceSheet,
     kCashFlow,
     kEarnings,
+    kStockOverview,
     kSharePrice,
-    kBeta,
     kRiskFreeRate
 };
 

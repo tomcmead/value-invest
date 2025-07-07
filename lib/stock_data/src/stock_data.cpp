@@ -52,11 +52,11 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
         case kEarnings:
             api_instruction.append(stock_data::kEarnings_api);
             break;
+        case kStockOverview:
+            api_instruction.append(stock_data::kStock_overview_api);
+            break;
         case kSharePrice:
             api_instruction.append(stock_data::kShare_price_api);
-            break;
-        case kBeta:
-            api_instruction.append(stock_data::kBeta_api);
             break;
         case kRiskFreeRate:
             api_instruction.append(stock_data::kRisk_free_rate_api);
@@ -88,6 +88,34 @@ bool StockData::GetApiFundamentalData(const std::string symbol,
     return error_codes::Success;
 }
 
+/// @brief Gets stock overview data
+/// @param symbol stock ticker
+/// @return std::unique_ptr<StockOverview> StockOverview struct
+std::unique_ptr<StockOverview> StockData::GetStockOverviewData(const std::string symbol)
+{
+    spdlog::info("StockData::GetStockOverviewData");
+
+    std::string fundamental_data;
+    GetApiFundamentalData(symbol, kStockOverview, fundamental_data);
+
+    if(fundamental_data.empty() == true)
+    {
+        spdlog::critical("StockData::GetStockOverviewData fundamental data empty");
+        return nullptr;
+    }
+
+    JsonParser json_parser;
+    std::unique_ptr<StockOverview> financial_data = std::make_unique<StockOverview>();
+    financial_data = json_parser.ParseStockOverview(fundamental_data);
+
+    if(financial_data == nullptr)
+    {
+        spdlog::critical("StockData::GetStockOverviewData JSON parsing failed");
+        return nullptr;
+    }
+    return financial_data;
+}
+
 /// @brief Gets miscellaneous stock data
 /// @param symbol stock ticker
 /// @param data to be received
@@ -101,11 +129,6 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
     if(data_type == stock_data::SharePrice)
     {
         if(GetApiFundamentalData(symbol, kSharePrice, fundamental_data) == error_codes::Fail)
-            return error_codes::Fail;
-    }
-    else if(data_type == stock_data::Beta)
-    {
-        if(GetApiFundamentalData(symbol, kBeta, fundamental_data)  == error_codes::Fail)
             return error_codes::Fail;
     }
     else if(data_type == stock_data::RiskFreeRate)
@@ -125,8 +148,6 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
     bool parse_fail = true;
     if(data_type == stock_data::SharePrice)
         parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::SharePrice, data);
-    else if(data_type == stock_data::Beta)
-        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::Beta, data);
     else if(data_type == stock_data::RiskFreeRate)
         parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::RiskFreeRate, data);
 

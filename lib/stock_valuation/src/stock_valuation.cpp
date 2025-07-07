@@ -17,19 +17,18 @@ bool StockValuation::DiscountedCashFlow(const std::string symbol){
     spdlog::info("StockValuation::DiscountedCashFlow");
 
     float share_price = 0;
-    float beta = 0;
     float risk_free_rate = 0;
 
-    income_statement = stock_data.GetFinancialData<IncomeStatement>(symbol, kIncomeStatement);
-    balance_sheet = stock_data.GetFinancialData<BalanceSheet>(symbol, kBalanceSheet);
-    cash_flow = stock_data.GetFinancialData<CashFlow>(symbol, kCashFlow);
-    earnings = stock_data.GetFinancialData<Earnings>(symbol, kEarnings);
+    income_statement = stock_data.GetAnnualReportData<IncomeStatement>(symbol, kIncomeStatement);
+    balance_sheet = stock_data.GetAnnualReportData<BalanceSheet>(symbol, kBalanceSheet);
+    cash_flow = stock_data.GetAnnualReportData<CashFlow>(symbol, kCashFlow);
+    earnings = stock_data.GetAnnualReportData<Earnings>(symbol, kEarnings);
+    stock_overview = stock_data.GetStockOverviewData(symbol);
     stock_data.GetMiscData(symbol, share_price, stock_data::SharePrice);
-    stock_data.GetMiscData(symbol, beta, stock_data::Beta);
     stock_data.GetMiscData(symbol, risk_free_rate, stock_data::RiskFreeRate);
     risk_free_rate /= 100;
 
-    if(income_statement==nullptr || balance_sheet==nullptr || cash_flow==nullptr || earnings==nullptr){
+    if(income_statement==nullptr || balance_sheet==nullptr || cash_flow==nullptr || earnings==nullptr || stock_overview==nullptr){
          spdlog::critical("StockValuation::DiscountedCashFlow Financial Document NULL");
          return error_codes::Fail;
     }
@@ -41,14 +40,13 @@ bool StockValuation::DiscountedCashFlow(const std::string symbol){
     const float effective_tax_rate = income_statement->income_tax_expense[year] / income_statement->income_before_tax[year];
     const float growth = GrowthValue(year);
     const float forecast_free_cash = ForecastFreeCashFlow(year, effective_tax_rate);
-    const float wacc = WeightedAverageCostofCapital(year, share_price, beta, growth, effective_tax_rate, risk_free_rate);
+    const float wacc = WeightedAverageCostofCapital(year, share_price, growth, effective_tax_rate, risk_free_rate);
     const float terminal_value = TerminalValue(valuation_data::kForecast_years, forecast_free_cash, wacc, growth);
     const float enterprise_value = EnterpriseValue(valuation_data::kForecast_years, forecast_free_cash, wacc, terminal_value);
     const float per_share_value = PerShareValue(year, enterprise_value);
 
     spdlog::info("Growth: {}", growth);
     spdlog::info("Share Price: {}", share_price);
-    spdlog::info("Beta: {}", beta);
     spdlog::info("Forecast Free Cash Flow {} ", forecast_free_cash);
     spdlog::info("WACC {} ", wacc);
     spdlog::info("Terminal Value {} ", terminal_value);
@@ -77,27 +75,22 @@ float StockValuation::ForecastFreeCashFlow(const int year, const float tax_rate)
 ///         It is the average rate that a company expects to pay to finance its business.
 /// @param year the start year
 /// @param share_price current share price
-/// @param share_beta company volatility metric
 /// @param growth estimated year-on-year growth of company
 /// @param tax_rate company average tax rate
 /// @param risk_free_rate yield on a 10-year U.S. Treasury bond
 /// @return float Weighted Average Cost of Capital (WACC)
-float StockValuation::WeightedAverageCostofCapital(const int year, const float share_price, const float share_beta, const float growth, const float tax_rate, const float risk_free_rate){
+float StockValuation::WeightedAverageCostofCapital(const int year, const float share_price, const float growth, const float tax_rate, const float risk_free_rate){
     spdlog::info("StockValuation::WeightedAverageCostofCapital");
 
-    float market_cap = MarketCap(share_price, balance_sheet->common_stock_shares_outstanding[year]);
+    float market_cap = stock_overview->market_capitalization;
     float market_val_debt = balance_sheet->short_long_term_debt_total[year];
     float total_enterprise_value = market_cap + market_val_debt;
-    float cost_of_equity = risk_free_rate * share_beta * (growth-risk_free_rate);
+    float cost_of_equity = risk_free_rate * stock_overview->beta * (growth-risk_free_rate);
     float interest_rate = income_statement->interest_expense[year] / balance_sheet->short_long_term_debt_total[year];
     float cost_of_debt = interest_rate * (1-tax_rate);
 
     return ((market_cap/total_enterprise_value) * cost_of_equity) +
             ((market_val_debt/total_enterprise_value) * cost_of_debt * (1-tax_rate));
-}
-
-float StockValuation::MarketCap(const float share_price, const int common_share_outstanding) const{
-    return share_price * common_share_outstanding;
 }
 
 /// @brief estimated value beyond a forecast period into perpetuity
