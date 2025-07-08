@@ -51,7 +51,7 @@ bool StockValuation::DiscountedCashFlow(const std::string symbol){
     spdlog::info("WACC {} ", wacc);
     spdlog::info("Terminal Value {} ", terminal_value);
     spdlog::info("Enterprise Value {} ", enterprise_value);
-    spdlog::info("Per Share Value {} ", per_share_value);
+    spdlog::info("Per Share Value {} in {} years", per_share_value, valuation_data::kForecast_years);
 
     return error_codes::Success;
 }
@@ -83,14 +83,14 @@ float StockValuation::WeightedAverageCostofCapital(const int year, const float s
     spdlog::info("StockValuation::WeightedAverageCostofCapital");
 
     float market_cap = stock_overview->market_capitalization;
-    float market_val_debt = balance_sheet->short_long_term_debt_total[year];
+    float market_val_debt = balance_sheet->current_accounts_payable[year] + balance_sheet->current_long_term_debt[year];
     float total_enterprise_value = market_cap + market_val_debt;
-    float cost_of_equity = risk_free_rate * stock_overview->beta * (growth-risk_free_rate);
+    float cost_of_equity = risk_free_rate + (stock_overview->beta * (growth-risk_free_rate));
     float interest_rate = income_statement->interest_expense[year] / balance_sheet->short_long_term_debt_total[year];
     float cost_of_debt = interest_rate * (1-tax_rate);
 
     return ((market_cap/total_enterprise_value) * cost_of_equity) +
-            ((market_val_debt/total_enterprise_value) * cost_of_debt * (1-tax_rate));
+            ((market_val_debt/total_enterprise_value) * cost_of_debt);
 }
 
 /// @brief estimated value beyond a forecast period into perpetuity
@@ -105,8 +105,7 @@ float StockValuation::TerminalValue(const int forecast_years, float forecast_fcf
     for(int i=0; i<forecast_years; i++)
         forecast_fcf *= (1+growth);
 
-    return (forecast_fcf * (1 + growth)) /
-        (wacc - growth);
+    return forecast_fcf / (wacc-growth);
 }
 
 /// @brief Compute companies enterprise (total) value.
