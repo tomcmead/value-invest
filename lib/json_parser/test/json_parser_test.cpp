@@ -7,11 +7,12 @@
 TEST(JsonParser, ParseMiscData_InvalidEmptyJson_ReturnFalse) {
     JsonParser json_parser;
     float misc_data = 0;
+    const float kMisc_data_result = 0;
 
     const bool result = json_parser.ParseMiscData(json_mocks::kEmpty, misc_type::SharePrice, misc_data);
 
     EXPECT_EQ(result, error_codes::Fail);
-    EXPECT_EQ(misc_data, 0);
+    EXPECT_EQ(misc_data, kMisc_data_result);
 }
 
 TEST(JsonParser, ParseMiscData_ValidSharePrice_ReturnTrue) {
@@ -27,12 +28,13 @@ TEST(JsonParser, ParseMiscData_ValidSharePrice_ReturnTrue) {
 
 TEST(JsonParser, ParseMiscData_InvalidSharePrice_ReturnFalse) {
     JsonParser json_parser;
-    float misc_data = 0;
+    float share_price = 0;
+    const float kShare_price_result = 0;
 
-    const bool result = json_parser.ParseMiscData(json_mocks::kInvalidSharePrice, misc_type::SharePrice, misc_data);
+    const bool result = json_parser.ParseMiscData(json_mocks::kInvalidSharePrice, misc_type::SharePrice, share_price);
 
     EXPECT_EQ(result, error_codes::Fail);
-    EXPECT_EQ(misc_data, 0);
+    EXPECT_EQ(share_price, kShare_price_result);
 }
 
 
@@ -72,4 +74,27 @@ TEST(JsonParser, ParseStockOverview_InvalidOverview_ReturnNull) {
     stock_overview = json_parser.ParseStockOverview(json_mocks::kInvalidStockOverview);
 
     EXPECT_EQ(stock_overview, nullptr);
+}
+
+
+TEST(JsonParser, ParseMiscData_ValidRiskFreeRate_ReturnTrue) {
+    JsonParser json_parser;
+    float risk_free_rate = 0;
+    const float kRisk_free_rate_result = 4.38;
+
+    const bool result = json_parser.ParseMiscData(json_mocks::kValidTreasuryYield, misc_type::RiskFreeRate, risk_free_rate);
+
+    EXPECT_EQ(result, error_codes::Success);
+    EXPECT_EQ(risk_free_rate, kRisk_free_rate_result);
+}
+
+TEST(JsonParser, ParseMiscData_InvalidRiskFreeRate_ReturnFalse) {
+    JsonParser json_parser;
+    float risk_free_rate = 0;
+    const float kRisk_free_rate_result = 0;
+
+    const bool result = json_parser.ParseMiscData(json_mocks::kInvalidTreasuryYield, misc_type::RiskFreeRate, risk_free_rate);
+
+    EXPECT_EQ(result, error_codes::Fail);
+    EXPECT_EQ(risk_free_rate, kRisk_free_rate_result);
 }

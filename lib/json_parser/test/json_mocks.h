@@ -74,7 +74,7 @@ namespace json_mocks{
         \"ExDividendDate\": \"2025-05-09\"\
     }";
     const std::string kInvalidStockOverview = "{\"test\": \"INVALID\"}";
-    const std::string kValidTreasury = "{\
+    const std::string kValidTreasuryYield = "{\
         \"name\": \"10-Year Treasury Constant Maturity Rate\",\
         \"interval\": \"monthly\",\
         \"unit\": \"percent\",\
@@ -91,7 +91,7 @@ namespace json_mocks{
                 \"date\": \"2025-04-01\",\
                 \"value\": \"4.28\"\
     }]}";
-    const std::string kInvalidTreasury = "{\"data\": [{\
+    const std::string kInvalidTreasuryYield = "{\"data\": [{\
         \"date\": \"2025-06-01\",\
         \"value\": \"INVALID\"\
     }]}";
