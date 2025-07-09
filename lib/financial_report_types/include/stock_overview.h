@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-/// @brief Balance sheet data structure
+/// @brief Stock overview data structure
 struct StockOverview
 {
 public:

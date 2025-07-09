@@ -61,14 +61,19 @@ std::unique_ptr<StockOverview> JsonParser::ParseStockOverview(const std::string 
 
     rapidjson::Document json_document;
 
-    if(json_document.Parse<0>(financial_json.c_str()).HasParseError() && json_document.HasMember("MarketCapitalization"))
+    if(json_document.Parse<0>(financial_json.c_str()).HasParseError())
+    {
+        spdlog::critical("JsonParser::ParseStockOverview fundamental JSON data contains error");
+        return nullptr;
+    }
+    if(!json_document.HasMember("MarketCapitalization"))
     {
         spdlog::critical("JsonParser::ParseStockOverview fundamental JSON data contains error");
         return nullptr;
     }
 
     std::unique_ptr<StockOverview> financial_data = std::make_unique<StockOverview>();
-    financial_data->valid = false;
+    financial_data->valid = true;
     std::string data_str = "";
 
     data_str = json_document["MarketCapitalization"].GetString();

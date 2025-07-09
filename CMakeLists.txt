@@ -72,6 +72,7 @@ target_include_directories(${TEST_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/curl_handler/include
     ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/json_parser/include
     ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/error_codes/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/financial_report_types/include
 )
 target_link_libraries(
     ${TEST_NAME}
