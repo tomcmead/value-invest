@@ -1,12 +1,6 @@
 #include "curl_handler.h"
 #include <spdlog/spdlog.h>
 
-namespace
-{
-    constexpr long kHttp_bad_request = 300;
-    constexpr long kCurl_timeout_ms = 50000;
-}
-
 CurlHandler* CurlHandler::curl_handler_instance = nullptr; // singleton
 
 /// @brief Initialise cURL library
@@ -17,7 +11,7 @@ CurlHandler::CurlHandler()
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl_handle = curl_easy_init();
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, CurlWriteCallback);
-    curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT_MS, kCurl_timeout_ms);
+    curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT_MS, curl_setup::kCurl_timeout_ms);
     spdlog::info("CurlHandler::CurlHandler Configured");
 }
 
@@ -81,7 +75,7 @@ long CurlHandler::PerformHttpGet(const std::string url, std::string &response) c
     catch(const std::exception &e)
     {
         spdlog::critical(e.what());
-        return kHttp_bad_request;
+        return curl_setup::kHttp_bad_request;
     }
 
     curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
