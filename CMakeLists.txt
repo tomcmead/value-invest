@@ -65,10 +65,13 @@ enable_testing()
 add_executable(
     ${TEST_NAME}
     ${LIB_DIR}/curl_handler/${TEST_DIR}/curl_handler_test.cpp
+    ${LIB_DIR}/json_parser/${TEST_DIR}/json_parser_test.cpp
 )
 target_include_directories(${TEST_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/_deps/rapidjson-src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/curl_handler/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/json_parser/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_DIR}/error_codes/include
 )
 target_link_libraries(
     ${TEST_NAME}

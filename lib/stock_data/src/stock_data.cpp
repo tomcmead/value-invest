@@ -147,9 +147,9 @@ bool StockData::GetMiscData(const std::string symbol, float& data, stock_data::M
 
     bool parse_fail = true;
     if(data_type == stock_data::SharePrice)
-        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::SharePrice, data);
+        parse_fail = json_parser.ParseMiscData(fundamental_data, misc_type::SharePrice, data);
     else if(data_type == stock_data::RiskFreeRate)
-        parse_fail = json_parser.ParseMiscData(fundamental_data, json_parser::RiskFreeRate, data);
+        parse_fail = json_parser.ParseMiscData(fundamental_data, misc_type::RiskFreeRate, data);
 
     if(parse_fail == true)
     {

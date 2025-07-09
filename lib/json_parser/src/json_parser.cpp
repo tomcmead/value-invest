@@ -7,7 +7,7 @@
 /// @param misc_data float& for misc_data result
 /// @return bool success/fail
 bool JsonParser::ParseMiscData(const std::string financial_json,
-        json_parser::MiscParseData data_type,
+        misc_type::MiscParseData data_type,
         float& misc_data)
 {
     spdlog::info("JsonParser::ParseMiscData");
@@ -22,12 +22,12 @@ bool JsonParser::ParseMiscData(const std::string financial_json,
 
     std::string data_str;
 
-    if(data_type==json_parser::SharePrice && json_document.HasMember("Global Quote"))
+    if(data_type==misc_type::SharePrice && json_document.HasMember("Global Quote"))
     {
         const rapidjson::Value& price_type = json_document["Global Quote"];
         data_str = price_type["05. price"].GetString();
     }
-    else if(data_type==json_parser::RiskFreeRate && json_document.HasMember("data"))
+    else if(data_type==misc_type::RiskFreeRate && json_document.HasMember("data"))
     {
         const rapidjson::Value& val_array = json_document["data"];
         const rapidjson::Value& val = val_array[0];

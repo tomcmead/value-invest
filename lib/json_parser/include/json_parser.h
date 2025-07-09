@@ -10,7 +10,7 @@
 #include <string>
 #include <memory>
 
-namespace json_parser
+namespace misc_type
 {
     enum MiscParseData {SharePrice, RiskFreeRate};
 }
@@ -23,11 +23,8 @@ public:
     std::unique_ptr<TFinacialReport> ParseAnnualReports(const std::string financial_json);
     std::unique_ptr<StockOverview> ParseStockOverview(const std::string financial_json);
     bool ParseMiscData(const std::string financial_json,
-        json_parser::MiscParseData data_type,
+        misc_type::MiscParseData data_type,
         float& misc_data);
-private:
-    template <typename TFinacialReport>
-    std::unique_ptr<TFinacialReport> ParseAnnualReports(rapidjson::Document& json_document);
 };
 
 /// @brief Parse JSON FinancialReportType object to FinancialData type
